@@ -9,11 +9,7 @@ export const useBrands = () => {
         .from("brands")
         .select(`
           *,
-          brand_stats (
-            total_clicks,
-            total_links,
-            conversion_rate
-          )
+          brand_stats(*)
         `)
         .eq("is_active", true)
         .order("name");
@@ -30,14 +26,7 @@ export const useBrand = (handle: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brands")
-        .select(`
-          *,
-          brand_stats (
-            total_clicks,
-            total_links,
-            conversion_rate
-          )
-        `)
+        .select("*")
         .eq("handle", handle)
         .eq("is_active", true)
         .single();
