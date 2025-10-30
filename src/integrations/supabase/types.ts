@@ -14,7 +14,193 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      brand_links: {
+        Row: {
+          brand_id: string
+          category_id: string
+          created_at: string
+          display_order: number
+          icon: string | null
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          title: string
+          url: string
+        }
+        Insert: {
+          brand_id: string
+          category_id: string
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          title: string
+          url: string
+        }
+        Update: {
+          brand_id?: string
+          category_id?: string
+          created_at?: string
+          display_order?: number
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_links_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brand_links_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "link_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_stats: {
+        Row: {
+          brand_id: string
+          conversion_rate: number
+          id: string
+          last_updated: string
+          total_clicks: number
+          total_links: number
+        }
+        Insert: {
+          brand_id: string
+          conversion_rate?: number
+          id?: string
+          last_updated?: string
+          total_clicks?: number
+          total_links?: number
+        }
+        Update: {
+          brand_id?: string
+          conversion_rate?: number
+          id?: string
+          last_updated?: string
+          total_clicks?: number
+          total_links?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_stats_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: true
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brands: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          handle: string
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          description?: string | null
+          handle: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          handle?: string
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      link_analytics: {
+        Row: {
+          brand_link_id: string
+          clicked_at: string
+          id: string
+          ip_address: string | null
+          referrer: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          brand_link_id: string
+          clicked_at?: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          brand_link_id?: string
+          clicked_at?: string
+          id?: string
+          ip_address?: string | null
+          referrer?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "link_analytics_brand_link_id_fkey"
+            columns: ["brand_link_id"]
+            isOneToOne: false
+            referencedRelation: "brand_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      link_categories: {
+        Row: {
+          created_at: string
+          display_order: number
+          icon: string
+          id: string
+          is_active: boolean
+          name: Database["public"]["Enums"]["link_category_name"]
+        }
+        Insert: {
+          created_at?: string
+          display_order: number
+          icon: string
+          id?: string
+          is_active?: boolean
+          name: Database["public"]["Enums"]["link_category_name"]
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          name?: Database["public"]["Enums"]["link_category_name"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +209,12 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      link_category_name:
+        | "Contact & Info"
+        | "Social Media"
+        | "Class Schedules"
+        | "Membership"
+        | "Featured Content"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +341,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      link_category_name: [
+        "Contact & Info",
+        "Social Media",
+        "Class Schedules",
+        "Membership",
+        "Featured Content",
+      ],
+    },
   },
 } as const
