@@ -1,60 +1,31 @@
 import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Brain, BarChart3, Users, TrendingUp, Sparkles, Plus } from "lucide-react";
 import gymHero from "@/assets/gym-hero.jpg";
+import { useBrands } from "@/hooks/useBrands";
+import { seedDatabase } from "@/utils/seedDatabase";
+import { useState } from "react";
 
 const Index = () => {
-  const brands = [
-    { 
-      name: "PowerFit Studio", 
-      handle: "powerfitstudio", 
-      color: "linear-gradient(135deg, #FF6B6B, #FF4757)",
-      links: 8,
-      clicks: 12847,
-      conversionRate: 24.3
-    },
-    { 
-      name: "Iron Temple", 
-      handle: "irontemplegym", 
-      color: "linear-gradient(135deg, #4ECDC4, #44A08D)",
-      links: 12,
-      clicks: 18392,
-      conversionRate: 31.7
-    },
-    { 
-      name: "Velocity Fitness", 
-      handle: "velocityfit", 
-      color: "linear-gradient(135deg, #F9CA24, #F0932B)",
-      links: 6,
-      clicks: 9283,
-      conversionRate: 19.8
-    },
-    { 
-      name: "Apex Training", 
-      handle: "apextraining", 
-      color: "linear-gradient(135deg, #A29BFE, #6C5CE7)",
-      links: 10,
-      clicks: 15627,
-      conversionRate: 28.5
-    },
-    { 
-      name: "Elite Performance", 
-      handle: "eliteperformance", 
-      color: "linear-gradient(135deg, #FD79A8, #E84393)",
-      links: 9,
-      clicks: 11492,
-      conversionRate: 22.1
-    },
-    { 
-      name: "CoreStrength Lab", 
-      handle: "corestrengthlabs", 
-      color: "linear-gradient(135deg, #00B894, #00BF9D)",
-      links: 7,
-      clicks: 8834,
-      conversionRate: 26.9
-    },
-  ];
+  const { data: brands, isLoading } = useBrands();
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeedDatabase = async () => {
+    setIsSeeding(true);
+    await seedDatabase();
+    setIsSeeding(false);
+    window.location.reload();
+  };
+
+  // Calculate aggregate stats from all brands
+  const totalClicks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_clicks || 0), 0) || 0;
+  const totalLinks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_links || 0), 0) || 0;
+  const avgConversionRate = brands && brands.length > 0
+    ? (brands.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.conversion_rate || 0), 0) / brands.length).toFixed(1)
+    : "0.0";
+  const activeBrands = brands?.length || 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -95,6 +66,16 @@ const Index = () => {
                 <Plus className="w-5 h-5" />
                 Add New Brand
               </Button>
+              {brands?.length === 0 && (
+                <Button 
+                  size="lg" 
+                  onClick={handleSeedDatabase}
+                  disabled={isSeeding}
+                  className="gap-2"
+                >
+                  {isSeeding ? "Seeding..." : "🌱 Seed Database"}
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -102,36 +83,45 @@ const Index = () => {
 
       {/* Stats Overview */}
       <div className="container mx-auto px-4 -mt-12 relative z-10 mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            title="Total Clicks"
-            value="76.5K"
-            change="+12.3% from last month"
-            icon={BarChart3}
-            trend="up"
-          />
-          <StatsCard
-            title="Avg Conversion"
-            value="25.5%"
-            change="+4.2% from last month"
-            icon={TrendingUp}
-            trend="up"
-          />
-          <StatsCard
-            title="Active Brands"
-            value="10"
-            change="All brands optimized"
-            icon={Users}
-            trend="up"
-          />
-          <StatsCard
-            title="AI Suggestions"
-            value="47"
-            change="New optimizations ready"
-            icon={Brain}
-            trend="up"
-          />
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+            <Skeleton className="h-32" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatsCard
+              title="Total Clicks"
+              value={totalClicks.toLocaleString()}
+              change="+12.3% from last month"
+              icon={BarChart3}
+              trend="up"
+            />
+            <StatsCard
+              title="Avg Conversion"
+              value={`${avgConversionRate}%`}
+              change="+4.2% from last month"
+              icon={TrendingUp}
+              trend="up"
+            />
+            <StatsCard
+              title="Active Brands"
+              value={activeBrands.toString()}
+              change="All brands optimized"
+              icon={Users}
+              trend="up"
+            />
+            <StatsCard
+              title="Total Links"
+              value={totalLinks.toString()}
+              change="Across all brands"
+              icon={Brain}
+              trend="up"
+            />
+          </div>
+        )}
       </div>
 
       {/* Brands Grid */}
@@ -143,11 +133,31 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {brands.map((brand) => (
-            <BrandCard key={brand.handle} {...brand} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+          </div>
+        ) : brands && brands.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {brands.map((brand) => (
+              <BrandCard 
+                key={brand.id} 
+                name={brand.name}
+                handle={brand.handle}
+                color={brand.color || "#667eea"}
+                links={brand.brand_stats?.[0]?.total_links || 0}
+                clicks={brand.brand_stats?.[0]?.total_clicks || 0}
+                conversionRate={Number(brand.brand_stats?.[0]?.conversion_rate || 0)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground mb-4">No brands found. Click "Seed Database" above to populate with your gym data.</p>
+          </div>
+        )}
       </div>
     </div>
   );
