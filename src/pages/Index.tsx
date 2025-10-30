@@ -5,19 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Brain, BarChart3, Users, TrendingUp, Sparkles, Plus } from "lucide-react";
 import gymHero from "@/assets/gym-hero.jpg";
 import { useBrands } from "@/hooks/useBrands";
-import { seedDatabase } from "@/utils/seedDatabase";
-import { useState } from "react";
 
 const Index = () => {
   const { data: brands, isLoading } = useBrands();
-  const [isSeeding, setIsSeeding] = useState(false);
-
-  const handleSeedDatabase = async () => {
-    setIsSeeding(true);
-    await seedDatabase();
-    setIsSeeding(false);
-    window.location.reload();
-  };
 
   // Calculate aggregate stats from all brands
   const totalClicks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_clicks || 0), 0) || 0;
@@ -66,16 +56,6 @@ const Index = () => {
                 <Plus className="w-5 h-5" />
                 Add New Brand
               </Button>
-              {brands?.length === 0 && (
-                <Button 
-                  size="lg" 
-                  onClick={handleSeedDatabase}
-                  disabled={isSeeding}
-                  className="gap-2"
-                >
-                  {isSeeding ? "Seeding..." : "🌱 Seed Database"}
-                </Button>
-              )}
             </div>
           </div>
         </div>
@@ -141,7 +121,7 @@ const Index = () => {
           </div>
         ) : brands && brands.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {brands.map((brand) => (
+            {brands.map((brand: any) => (
               <BrandCard 
                 key={brand.id} 
                 name={brand.name}
@@ -155,7 +135,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground mb-4">No brands found. Click "Seed Database" above to populate with your gym data.</p>
+            <p className="text-muted-foreground">No brands found.</p>
           </div>
         )}
       </div>
