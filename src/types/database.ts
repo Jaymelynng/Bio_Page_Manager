@@ -44,6 +44,17 @@ export interface BrandLink {
   category?: LinkCategory;
 }
 
+// Helper type for seeding data with category name instead of ID
+export interface BrandLinkSeed {
+  category: string;
+  title: string;
+  url: string;
+  icon: string;
+  display_order: number;
+  is_featured: boolean;
+  is_active: boolean;
+}
+
 export interface LinkAnalytics {
   id: string;
   brand_link_id: string;

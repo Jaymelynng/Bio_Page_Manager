@@ -1,4 +1,4 @@
-import { Brand, LinkCategory, BrandLink } from "@/types/database";
+import { Brand, LinkCategory, BrandLinkSeed } from "@/types/database";
 
 export const linkCategories: Omit<LinkCategory, 'id'>[] = [
   { name: "Contact & Info", icon: "Phone", display_order: 1, is_active: true },
@@ -202,7 +202,7 @@ export const brands: Omit<Brand, 'id' | 'created_at' | 'updated_at'>[] = [
 ];
 
 // Helper function to create brand links - will be used for seeding
-export const createBrandLinks = (brandHandle: string): Omit<BrandLink, 'id' | 'brand_id' | 'category_id' | 'created_at'>[] => {
+export const createBrandLinks = (brandHandle: string): BrandLinkSeed[] => {
   const commonLinks = {
     capgymcpk: [
       { category: "Contact & Info", title: "Call Us", url: "tel:512-259-9995", icon: "📞", display_order: 1, is_featured: false, is_active: true },
