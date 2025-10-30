@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Eye, MousePointerClick, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface BrandCardProps {
   name: string;
@@ -20,6 +21,8 @@ export const BrandCard = ({
   clicks, 
   conversionRate 
 }: BrandCardProps) => {
+  const navigate = useNavigate();
+
   return (
     <Card className="group relative overflow-hidden bg-gradient-card border-border hover:border-primary/50 transition-all duration-500 hover:shadow-[0_0_30px_hsl(var(--primary)/0.2)] animate-fade-in">
       <div 
@@ -70,8 +73,13 @@ export const BrandCard = ({
             <BarChart3 className="w-4 h-4" />
             Analytics
           </Button>
-          <Button variant="premium" size="sm" className="flex-1">
-            Edit Page
+          <Button 
+            variant="premium" 
+            size="sm" 
+            className="flex-1"
+            onClick={() => navigate(`/${handle}`)}
+          >
+            View Page
           </Button>
         </div>
       </div>
