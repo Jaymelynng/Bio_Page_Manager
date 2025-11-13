@@ -47,13 +47,40 @@ const BrandBioPage = () => {
     return acc;
   }, {} as Record<string, any[]>);
 
-  const getIconForLink = (title: string, icon?: string) => {
-    if (icon) return icon;
+  const getIconForLink = (title: string, iconName?: string): JSX.Element | string | null => {
+    // Map database icon text to Lucide React components
+    const iconMap: Record<string, JSX.Element> = {
+      'Phone': <Phone className="w-5 h-5" />,
+      'Mail': <Mail className="w-5 h-5" />,
+      'MapPin': <MapPin className="w-5 h-5" />,
+      'Calendar': <Calendar className="w-5 h-5" />,
+      'Gift': <Gift className="w-5 h-5" />,
+      'Instagram': <Instagram className="w-5 h-5" />,
+      'Facebook': <Facebook className="w-5 h-5" />,
+      'MessageCircle': <MessageCircle className="w-5 h-5" />,
+    };
+    
+    // If it's an emoji (not a Lucide component name), return it directly
+    if (iconName && !iconMap[iconName]) {
+      return iconName;
+    }
+    
+    // If database has a Lucide icon name, use it
+    if (iconName && iconMap[iconName]) {
+      return iconMap[iconName];
+    }
+    
+    // Otherwise detect from title
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('call') || lowerTitle.includes('phone')) return <Phone className="w-5 h-5" />;
+    if (lowerTitle.includes('email') || lowerTitle.includes('mail')) return <Mail className="w-5 h-5" />;
     if (lowerTitle.includes('direction') || lowerTitle.includes('map')) return <MapPin className="w-5 h-5" />;
     if (lowerTitle.includes('trial') || lowerTitle.includes('book')) return <Calendar className="w-5 h-5" />;
     if (lowerTitle.includes('gift') || lowerTitle.includes('certificate')) return <Gift className="w-5 h-5" />;
+    if (lowerTitle.includes('facebook')) return <Facebook className="w-5 h-5" />;
+    if (lowerTitle.includes('instagram')) return <Instagram className="w-5 h-5" />;
+    if (lowerTitle.includes('messenger')) return <MessageCircle className="w-5 h-5" />;
+    
     return null;
   };
 
@@ -100,24 +127,49 @@ const BrandBioPage = () => {
           </div>
         ) : (
           <>
-            {/* Featured Action Buttons */}
+            {/* Quick Actions Section */}
             {featuredLinks.length > 0 && (
-              <div className="space-y-3 mt-6 mb-8">
-                {featuredLinks.map((link: any) => (
+              <div className="mt-6 mb-8">
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
+                  ⚡ Quick Actions
+                </h2>
+                
+                {/* 2x2 Grid for first 4 featured links (excluding trial) */}
+                {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).length > 0 && (
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).map((link: any) => (
+                      <button
+                        key={link.id}
+                        onClick={() => handleLinkClick(link.id, link.url)}
+                        className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
+                        style={{ background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)` }}
+                      >
+                        <span className="text-2xl">{getIconForLink(link.title, link.icon)}</span>
+                        <span className="text-sm text-center">{link.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Full-width Free Trial Button */}
+                {featuredLinks.find(link => link.title.toLowerCase().includes('trial')) && (
                   <button
-                    key={link.id}
-                    onClick={() => handleLinkClick(link.id, link.url)}
-                    className="w-full py-4 px-6 rounded-lg font-semibold text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
-                    style={{
-                      background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)`,
-                    }}
+                    onClick={() => handleLinkClick(
+                      featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.id,
+                      featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.url
+                    )}
+                    className="w-full py-4 px-6 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)` }}
                   >
-                    <span className="flex items-center justify-center gap-2">
-                      {getIconForLink(link.title, link.icon)}
-                      {link.title}
+                    <span className="text-xl">
+                      {getIconForLink(
+                        featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.title,
+                        featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.icon
+                      )}
                     </span>
+                    {featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.title}
                   </button>
-                ))}
+                )}
               </div>
             )}
 
@@ -137,13 +189,11 @@ const BrandBioPage = () => {
                     <button
                       key={link.id}
                       onClick={() => handleLinkClick(link.id, link.url)}
-                      className="w-full py-3 px-4 bg-muted/50 hover:bg-muted rounded-lg text-left transition-colors flex items-center gap-3"
+                      className="w-full py-3 px-4 bg-background border border-border hover:bg-muted/50 rounded-lg text-left transition-colors flex items-center gap-3"
                     >
-                      {link.icon ? (
-                        <span className="text-xl">{link.icon}</span>
-                      ) : (
-                        getIconForLink(link.title)
-                      )}
+                      <span className="text-xl">
+                        {getIconForLink(link.title, link.icon)}
+                      </span>
                       <span className="font-medium text-foreground">{link.title}</span>
                     </button>
                   ))}
