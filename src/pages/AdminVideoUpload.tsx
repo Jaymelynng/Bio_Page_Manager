@@ -44,13 +44,16 @@ export default function AdminVideoUpload() {
         .from('gym-videos')
         .getPublicUrl(fileName);
 
-      // Update brand with video URL
-      const { error: updateError } = await supabase
-        .from('brands')
-        .update({ hero_video_url: publicUrl })
-        .eq('id', brandId);
+      // Update brand with video URL via edge function (bypasses RLS)
+      const { data: updateData, error: functionError } = await supabase.functions.invoke(
+        'update-brand-video',
+        {
+          body: { brandId, videoUrl: publicUrl }
+        }
+      );
 
-      if (updateError) throw updateError;
+      if (functionError) throw functionError;
+      if (!updateData?.success) throw new Error('Failed to update brand video');
 
       setCompletedIds(prev => new Set(prev).add(brandId));
       

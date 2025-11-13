@@ -1,1 +1,4 @@
 project_id = "qfffsgiopzpwcijdkvcv"
+
+[functions.update-brand-video]
+verify_jwt = false
