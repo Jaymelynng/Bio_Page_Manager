@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
-import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle } from "lucide-react";
+import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const BrandBioPage = () => {
