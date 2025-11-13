@@ -1,9 +1,7 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const BrandBioPage = () => {
@@ -19,12 +17,8 @@ const BrandBioPage = () => {
 
   if (brandLoading) {
     return (
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-48" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Skeleton className="h-64 w-full max-w-md" />
       </div>
     );
   }
@@ -32,22 +26,19 @@ const BrandBioPage = () => {
   if (!brand) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Brand Not Found</h1>
-          <p className="text-muted-foreground">The brand you're looking for doesn't exist.</p>
-          <Link to="/">
-            <Button>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Gym Not Found</h1>
         </div>
       </div>
     );
   }
 
-  // Group links by category
-  const groupedLinks = links?.reduce((acc, link: any) => {
+  // Get featured links
+  const featuredLinks = links?.filter((link: any) => link.is_featured) || [];
+  
+  // Group non-featured links by category
+  const regularLinks = links?.filter((link: any) => !link.is_featured) || [];
+  const groupedLinks = regularLinks.reduce((acc, link: any) => {
     const categoryName = link.category?.name || "Other";
     if (!acc[categoryName]) {
       acc[categoryName] = [];
@@ -56,63 +47,160 @@ const BrandBioPage = () => {
     return acc;
   }, {} as Record<string, any[]>);
 
+  const getIconForLink = (title: string, icon?: string) => {
+    if (icon) return icon;
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('call') || lowerTitle.includes('phone')) return <Phone className="w-5 h-5" />;
+    if (lowerTitle.includes('direction') || lowerTitle.includes('map')) return <MapPin className="w-5 h-5" />;
+    if (lowerTitle.includes('trial') || lowerTitle.includes('book')) return <Calendar className="w-5 h-5" />;
+    if (lowerTitle.includes('gift') || lowerTitle.includes('certificate')) return <Gift className="w-5 h-5" />;
+    return null;
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
+      {/* Hero Section with Gradient */}
       <div 
-        className="relative h-64 flex items-center justify-center overflow-hidden"
-        style={{ background: brand.color }}
+        className="relative py-12 px-4"
+        style={{ 
+          background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)`,
+        }}
       >
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 text-center text-white p-8">
-          <h1 className="text-5xl font-bold mb-2">{brand.name}</h1>
-          {brand.description && (
-            <p className="text-xl opacity-90">{brand.description}</p>
+        <div className="max-w-md mx-auto text-center">
+          {/* Logo Circle */}
+          {brand.logo_url && (
+            <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-full flex items-center justify-center p-4 shadow-lg">
+              <img 
+                src={brand.logo_url} 
+                alt={brand.name}
+                className="w-full h-full object-contain"
+              />
+            </div>
+          )}
+          
+          {/* Gym Name */}
+          <h1 className="text-3xl font-bold text-white mb-1">{brand.name}</h1>
+          
+          {/* Location */}
+          {(brand.city || brand.state) && (
+            <p className="text-white/90 text-sm">
+              {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
+            </p>
           )}
         </div>
-        <Link to="/" className="absolute top-4 left-4 z-20">
-          <Button variant="secondary" size="sm">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </Link>
       </div>
 
-      {/* Links Section */}
-      <div className="max-w-2xl mx-auto p-8 -mt-12">
-        <Card className="bg-card p-8 space-y-8">
-          {linksLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ) : (
-            Object.entries(groupedLinks || {}).map(([categoryName, categoryLinks]) => (
-              <div key={categoryName} className="space-y-3">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+      {/* Content */}
+      <div className="max-w-md mx-auto px-4 pb-8">
+        {linksLoading ? (
+          <div className="space-y-4 mt-6">
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+            <Skeleton className="h-14 w-full" />
+          </div>
+        ) : (
+          <>
+            {/* Featured Action Buttons */}
+            {featuredLinks.length > 0 && (
+              <div className="space-y-3 mt-6 mb-8">
+                {featuredLinks.map((link: any) => (
+                  <button
+                    key={link.id}
+                    onClick={() => handleLinkClick(link.id, link.url)}
+                    className="w-full py-4 px-6 rounded-lg font-semibold text-white shadow-md transition-all hover:shadow-lg active:scale-[0.98]"
+                    style={{
+                      background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)`,
+                    }}
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      {getIconForLink(link.title, link.icon)}
+                      {link.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Divider */}
+            {featuredLinks.length > 0 && Object.keys(groupedLinks).length > 0 && (
+              <div className="border-t border-border my-6" />
+            )}
+
+            {/* Regular Links by Category */}
+            {Object.entries(groupedLinks).map(([categoryName, categoryLinks]) => (
+              <div key={categoryName} className="mb-6">
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
                   {categoryName}
                 </h2>
                 <div className="space-y-2">
                   {categoryLinks.map((link: any) => (
-                    <Button
+                    <button
                       key={link.id}
-                      variant="outline"
-                      className="w-full justify-between h-auto py-4 px-6 hover:border-primary/50 transition-all"
                       onClick={() => handleLinkClick(link.id, link.url)}
+                      className="w-full py-3 px-4 bg-muted/50 hover:bg-muted rounded-lg text-left transition-colors flex items-center gap-3"
                     >
-                      <span className="flex items-center gap-3">
-                        {link.icon && <span className="text-2xl">{link.icon}</span>}
-                        <span className="font-medium">{link.title}</span>
-                      </span>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                    </Button>
+                      {link.icon ? (
+                        <span className="text-xl">{link.icon}</span>
+                      ) : (
+                        getIconForLink(link.title)
+                      )}
+                      <span className="font-medium text-foreground">{link.title}</span>
+                    </button>
                   ))}
                 </div>
               </div>
-            ))
-          )}
-        </Card>
+            ))}
+
+            {/* Social Media Buttons */}
+            {(brand.facebook_url || brand.instagram_url) && (
+              <>
+                <div className="border-t border-border my-8" />
+                <div className="flex justify-center gap-4">
+                  {brand.facebook_url && (
+                    <a
+                      href={brand.facebook_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
+                      style={{ borderColor: brand.color }}
+                    >
+                      <Facebook className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
+                  )}
+                  {brand.instagram_url && (
+                    <a
+                      href={brand.instagram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
+                      style={{ borderColor: brand.color }}
+                    >
+                      <Instagram className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
+                  )}
+                  {brand.facebook_url && (
+                    <a
+                      href={`https://m.me/${brand.facebook_url.split('/').pop()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
+                      style={{ borderColor: brand.color }}
+                    >
+                      <MessageCircle className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Footer */}
+            <div className="text-center mt-8 pt-6 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                © {new Date().getFullYear()} {brand.name}
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
