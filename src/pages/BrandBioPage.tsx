@@ -15,6 +15,16 @@ const BrandBioPage = () => {
     window.open(url, "_blank");
   };
 
+  // Helper to adjust brand color for gradient end
+  const adjustColor = (hex: string, percent: number): string => {
+    const num = parseInt(hex.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+    const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
+    const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+    return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+  };
+
   if (brandLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -85,40 +95,67 @@ const BrandBioPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section with Gradient */}
+    <div 
+      className="min-h-screen relative overflow-hidden py-5 px-4 md:py-8"
+      style={{
+        background: `linear-gradient(135deg, ${brand.color} 0%, ${adjustColor(brand.color, -20)} 100%)`
+      }}
+    >
+      {/* Animated background pattern */}
       <div 
-        className="relative py-12 px-4"
-        style={{ 
-          background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)`,
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 50%)
+          `,
+          animation: 'float 20s ease-in-out infinite',
+          zIndex: 0
         }}
-      >
-        <div className="max-w-md mx-auto text-center">
-          {/* Logo Circle */}
-          {brand.logo_url && (
-            <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-full flex items-center justify-center p-4 shadow-lg">
-              <img 
-                src={brand.logo_url} 
-                alt={brand.name}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
-          
-          {/* Gym Name */}
-          <h1 className="text-3xl font-bold text-white mb-1">{brand.name}</h1>
-          
-          {/* Location */}
-          {(brand.city || brand.state) && (
-            <p className="text-white/90 text-sm">
-              {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
-            </p>
-          )}
-        </div>
-      </div>
+      />
 
-      {/* Content */}
-      <div className="max-w-md mx-auto px-4 pb-8">
+      {/* White content container */}
+      <div 
+        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10"
+        style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
+      >
+        {/* Hero Section with Enhanced Gradient */}
+        <div 
+          className="relative py-12 px-4"
+          style={{ 
+            background: `linear-gradient(180deg, 
+              ${brand.color}b3 0%, 
+              ${brand.color}d9 50%, 
+              ${adjustColor(brand.color, -20)}e6 100%)`,
+          }}
+        >
+          <div className="max-w-md mx-auto text-center relative z-10">
+            {/* Logo Circle */}
+            {brand.logo_url && (
+              <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-full flex items-center justify-center p-4 shadow-lg">
+                <img 
+                  src={brand.logo_url} 
+                  alt={brand.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+            
+            {/* Gym Name */}
+            <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">{brand.name}</h1>
+            
+            {/* Location */}
+            {(brand.city || brand.state) && (
+              <p className="text-white/95 text-sm drop-shadow-md">
+                {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pb-8">
         {linksLoading ? (
           <div className="space-y-4 mt-6">
             <Skeleton className="h-14 w-full" />
@@ -251,6 +288,7 @@ const BrandBioPage = () => {
             </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );
