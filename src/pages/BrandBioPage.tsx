@@ -1,16 +1,48 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
 import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from "react";
 
 const BrandBioPage = () => {
   const { handle } = useParams<{ handle: string }>();
+  const navigate = useNavigate();
   const { data: brand, isLoading: brandLoading } = useBrand(handle || "");
   const { data: links, isLoading: linksLoading } = useBrandLinks(brand?.id || "");
   const trackClick = useTrackLinkClick();
+  const [isShiftStarActive, setIsShiftStarActive] = useState(false);
 
-  const handleLinkClick = (linkId: string, url: string) => {
+  // Secret combo: Shift + * (8)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key === '*') {
+        setIsShiftStarActive(true);
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.shiftKey || e.key === 'Shift') {
+        setIsShiftStarActive(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  const handleLinkClick = (linkId: string, url: string, linkTitle: string) => {
+    // Secret combo: Shift + * + click gift certificate
+    if (isShiftStarActive && linkTitle.toLowerCase().includes('gift')) {
+      navigate('/');
+      return;
+    }
+    
     trackClick.mutate(linkId);
     window.open(url, "_blank");
   };
@@ -209,12 +241,12 @@ const BrandBioPage = () => {
                 {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).length > 0 && (
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).map((link: any) => (
-                      <button
-                        key={link.id}
-                        onClick={() => handleLinkClick(link.id, link.url)}
-                        className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
-                        style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
-                      >
+                  <button
+                    key={link.id}
+                    onClick={() => handleLinkClick(link.id, link.url, link.title)}
+                    className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
+                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
+                  >
                         <span className="text-2xl">{getIconForLink(link.title, link.icon)}</span>
                         <span className="text-sm text-center">{link.title}</span>
                       </button>
@@ -224,14 +256,14 @@ const BrandBioPage = () => {
                 
                 {/* Full-width Free Trial Button */}
                 {featuredLinks.find(link => link.title.toLowerCase().includes('trial')) && (
-                  <button
-                    onClick={() => handleLinkClick(
-                      featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.id,
-                      featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.url
-                    )}
-                    className="w-full py-4 px-6 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
-                  >
+                <button
+                  onClick={() => {
+                    const trialLink = featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!;
+                    handleLinkClick(trialLink.id, trialLink.url, trialLink.title);
+                  }}
+                  className="w-full py-4 px-6 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                  style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
+                >
                     <span className="text-xl">
                       {getIconForLink(
                         featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.title,
@@ -257,11 +289,11 @@ const BrandBioPage = () => {
                 </h2>
                 <div className="space-y-2">
                   {categoryLinks.map((link: any) => (
-                    <button
-                      key={link.id}
-                      onClick={() => handleLinkClick(link.id, link.url)}
-                      className="w-full py-3 px-4 bg-background border border-border hover:bg-muted/50 rounded-lg text-left transition-colors flex items-center gap-3"
-                    >
+                  <button
+                    key={link.id}
+                    onClick={() => handleLinkClick(link.id, link.url, link.title)}
+                    className="w-full py-3 px-4 bg-background border border-border hover:bg-muted/50 rounded-lg text-left transition-colors flex items-center gap-3"
+                  >
                       <span className="text-xl">
                         {getIconForLink(link.title, link.icon)}
                       </span>
