@@ -15,15 +15,9 @@ const BrandBioPage = () => {
     window.open(url, "_blank");
   };
 
-  // Helper to adjust brand color for gradient end
-  const adjustColor = (hex: string, percent: number): string => {
-    const num = parseInt(hex.replace("#", ""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = Math.max(0, Math.min(255, (num >> 16) + amt));
-    const G = Math.max(0, Math.min(255, (num >> 8 & 0x00FF) + amt));
-    const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
-    return "#" + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
-  };
+  // Get secondary color or fallback
+  const secondaryColor = brand.color_secondary || brand.color;
+  const tertiaryColor = brand.color_tertiary || '#ffffff';
 
   if (brandLoading) {
     return (
@@ -98,7 +92,7 @@ const BrandBioPage = () => {
     <div 
       className="min-h-screen relative overflow-hidden py-5 px-4 md:py-8"
       style={{
-        background: `linear-gradient(135deg, ${brand.color} 0%, ${adjustColor(brand.color, -20)} 100%)`
+        background: `linear-gradient(135deg, ${brand.color} 0%, ${secondaryColor} 100%)`
       }}
     >
       {/* Animated background pattern */}
@@ -127,7 +121,7 @@ const BrandBioPage = () => {
             background: `linear-gradient(180deg, 
               ${brand.color}b3 0%, 
               ${brand.color}d9 50%, 
-              ${adjustColor(brand.color, -20)}e6 100%)`,
+              ${secondaryColor}e6 100%)`,
           }}
         >
           <div className="max-w-md mx-auto text-center relative z-10">
@@ -179,7 +173,7 @@ const BrandBioPage = () => {
                         key={link.id}
                         onClick={() => handleLinkClick(link.id, link.url)}
                         className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
-                        style={{ background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)` }}
+                        style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
                       >
                         <span className="text-2xl">{getIconForLink(link.title, link.icon)}</span>
                         <span className="text-sm text-center">{link.title}</span>
@@ -196,7 +190,7 @@ const BrandBioPage = () => {
                       featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.url
                     )}
                     className="w-full py-4 px-6 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${brand.color}dd)` }}
+                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
                   >
                     <span className="text-xl">
                       {getIconForLink(

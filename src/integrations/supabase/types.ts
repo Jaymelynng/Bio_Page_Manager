@@ -182,12 +182,15 @@ export type Database = {
           address: string | null
           city: string | null
           color: string
+          color_secondary: string | null
+          color_tertiary: string | null
           created_at: string
           description: string | null
           directions_url: string | null
           email: string | null
           facebook_url: string | null
           handle: string
+          hero_video_url: string | null
           id: string
           instagram_url: string | null
           is_active: boolean
@@ -208,12 +211,15 @@ export type Database = {
           address?: string | null
           city?: string | null
           color: string
+          color_secondary?: string | null
+          color_tertiary?: string | null
           created_at?: string
           description?: string | null
           directions_url?: string | null
           email?: string | null
           facebook_url?: string | null
           handle: string
+          hero_video_url?: string | null
           id?: string
           instagram_url?: string | null
           is_active?: boolean
@@ -234,12 +240,15 @@ export type Database = {
           address?: string | null
           city?: string | null
           color?: string
+          color_secondary?: string | null
+          color_tertiary?: string | null
           created_at?: string
           description?: string | null
           directions_url?: string | null
           email?: string | null
           facebook_url?: string | null
           handle?: string
+          hero_video_url?: string | null
           id?: string
           instagram_url?: string | null
           is_active?: boolean
