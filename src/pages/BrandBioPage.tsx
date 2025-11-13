@@ -148,7 +148,7 @@ const BrandBioPage = () => {
 
       {/* White content container */}
       <div 
-        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10 max-h-[85vh] overflow-y-auto"
+        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10"
         style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
         {/* Hero Section with Video Background */}
