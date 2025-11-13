@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import BrandBioPage from "./pages/BrandBioPage";
 import NotFound from "./pages/NotFound";
+import AdminVideoUpload from "./pages/AdminVideoUpload";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/admin/upload-videos" element={<AdminVideoUpload />} />
           <Route path="/:handle" element={<BrandBioPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
