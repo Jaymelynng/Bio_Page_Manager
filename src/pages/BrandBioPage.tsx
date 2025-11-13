@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
-import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail } from "lucide-react";
+import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail, BookOpen, Target, Moon, Star, PartyPopper, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState } from "react";
 
@@ -99,6 +99,12 @@ const BrandBioPage = () => {
       'Instagram': <Instagram className="w-5 h-5" />,
       'Facebook': <Facebook className="w-5 h-5" />,
       'MessageCircle': <MessageCircle className="w-5 h-5" />,
+      'BookOpen': <BookOpen className="w-5 h-5" />,
+      'Target': <Target className="w-5 h-5" />,
+      'Moon': <Moon className="w-5 h-5" />,
+      'Star': <Star className="w-5 h-5" />,
+      'PartyPopper': <PartyPopper className="w-5 h-5" />,
+      'User': <User className="w-5 h-5" />,
     };
     
     // If it's an emoji (not a Lucide component name), return it directly
@@ -297,9 +303,13 @@ const BrandBioPage = () => {
                   <button
                     key={link.id}
                     onClick={() => handleLinkClick(link.id, link.url, link.title)}
-                    className="w-full py-3 px-4 bg-background border border-border hover:bg-muted/50 rounded-lg text-left transition-colors flex items-center gap-3"
+                    className="w-full py-3 px-4 rounded-lg text-left transition-all flex items-center gap-3 border-2 hover:scale-[1.02] hover:shadow-md"
+                    style={{
+                      background: `linear-gradient(135deg, ${brand.color}08, ${secondaryColor}05)`,
+                      borderColor: `${brand.color}30`,
+                    }}
                   >
-                      <span className="text-xl">
+                      <span className="text-xl" style={{ color: brand.color }}>
                         {getIconForLink(link.title, link.icon)}
                       </span>
                       <span className="font-medium text-foreground">{link.title}</span>
