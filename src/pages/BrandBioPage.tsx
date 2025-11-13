@@ -52,7 +52,7 @@ const BrandBioPage = () => {
   const tertiaryColor = brand?.color_tertiary || '#ffffff';
   
   // Conditional hero height for Capital Cedar Park (narrower video)
-  const heroHeight = brand.handle === 'capital-gym-cedar-park' 
+  const heroHeight = brand?.handle === 'capital-gym-cedar-park' 
     ? 'h-[280px] md:h-[380px]' 
     : 'h-[300px] md:h-[400px]';
 
