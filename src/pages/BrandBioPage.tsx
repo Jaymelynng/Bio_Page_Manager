@@ -241,16 +241,41 @@ const BrandBioPage = () => {
           </div>
         ) : (
           <>
+            {/* Hero CTA Banner */}
+            <div 
+              className="mt-6 mb-8 rounded-2xl p-8 text-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` 
+              }}
+            >
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Start Your Journey Today!
+              </h2>
+              <p className="text-white/90 text-sm mb-4">
+                Experience the excitement with a FREE trial class
+              </p>
+              <button
+                onClick={() => {
+                  const trialLink = featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'));
+                  if (trialLink) handleLinkClick(trialLink.id, trialLink.url, trialLink.title);
+                }}
+                className="px-8 py-3 bg-white rounded-xl font-semibold hover:shadow-lg transition-all active:scale-[0.98]"
+                style={{ color: brand.color }}
+              >
+                Get Started
+              </button>
+            </div>
+
             {/* Quick Actions Section */}
             {featuredLinks.length > 0 && (
-              <div className="mt-6 mb-8">
-                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
-                  ⚡ Quick Actions
+              <div className="mb-8">
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 flex items-center gap-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
+                  Quick Actions
                 </h2>
                 
                 {/* 2x2 Grid for first 4 featured links (excluding trial) */}
                 {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).length > 0 && (
-                  <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div className="grid grid-cols-2 gap-3">
                     {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).map((link: any) => (
                   <button
                     key={link.id}
@@ -258,31 +283,11 @@ const BrandBioPage = () => {
                     className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
                     style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
                   >
-                        <span className="text-2xl">{getIconForLink(link.title, link.icon)}</span>
+                        <span className="text-3xl">{getIconForLink(link.title, link.icon)}</span>
                         <span className="text-sm text-center">{link.title}</span>
                       </button>
                     ))}
                   </div>
-                )}
-                
-                {/* Full-width Free Trial Button */}
-                {featuredLinks.find(link => link.title.toLowerCase().includes('trial')) && (
-                <button
-                  onClick={() => {
-                    const trialLink = featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!;
-                    handleLinkClick(trialLink.id, trialLink.url, trialLink.title);
-                  }}
-                  className="w-full py-4 px-6 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-                  style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
-                >
-                    <span className="text-xl">
-                      {getIconForLink(
-                        featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.title,
-                        featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.icon
-                      )}
-                    </span>
-                    {featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'))!.title}
-                  </button>
                 )}
               </div>
             )}
@@ -295,7 +300,7 @@ const BrandBioPage = () => {
             {/* Regular Links by Category */}
             {Object.entries(groupedLinks).map(([categoryName, categoryLinks]) => (
               <div key={categoryName} className="mb-6">
-                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
                   {categoryName}
                 </h2>
                 <div className="space-y-2">
@@ -303,16 +308,19 @@ const BrandBioPage = () => {
                   <button
                     key={link.id}
                     onClick={() => handleLinkClick(link.id, link.url, link.title)}
-                    className="w-full py-3 px-4 rounded-lg text-left transition-all flex items-center gap-3 border-2 hover:scale-[1.02] hover:shadow-md"
+                    className="w-full py-3 px-4 rounded-lg text-left transition-all flex items-center justify-between border-2 hover:scale-[1.02] hover:shadow-md"
                     style={{
                       background: `linear-gradient(135deg, ${brand.color}08, ${secondaryColor}05)`,
                       borderColor: `${brand.color}30`,
                     }}
                   >
-                      <span className="text-xl" style={{ color: brand.color }}>
-                        {getIconForLink(link.title, link.icon)}
-                      </span>
-                      <span className="font-medium text-foreground">{link.title}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">
+                          {getIconForLink(link.title, link.icon)}
+                        </span>
+                        <span className="font-medium text-foreground">{link.title}</span>
+                      </div>
+                      <span className="text-xl text-muted-foreground">→</span>
                     </button>
                   ))}
                 </div>
@@ -323,6 +331,9 @@ const BrandBioPage = () => {
             {(brand.facebook_url || brand.instagram_url) && (
               <>
                 <div className="border-t border-border my-8" />
+                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-center pb-2 border-b-2 inline-block w-full" style={{ color: brand.color, borderColor: brand.color }}>
+                  Connect With Us
+                </h2>
                 <div className="flex justify-center gap-4">
                   {brand.facebook_url && (
                     <a
@@ -362,8 +373,26 @@ const BrandBioPage = () => {
             )}
 
             {/* Footer */}
-            <div className="text-center mt-8 pt-6 border-t border-border">
-              <p className="text-sm text-muted-foreground">
+            <div className="mt-8 pt-6 border-t border-border">
+              {/* Gym Details Box */}
+              <div className="bg-muted/30 rounded-xl p-4 mb-4 text-center">
+                <p className="font-bold text-foreground mb-2">{brand.name}</p>
+                {brand.address && (
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {brand.address}
+                    {brand.city && brand.state && `, ${brand.city}, ${brand.state}`}
+                  </p>
+                )}
+                {brand.phone && (
+                  <p className="text-sm font-medium mt-2 flex items-center justify-center gap-2">
+                    <span>📞</span>
+                    <span style={{ color: brand.color }}>{brand.phone}</span>
+                  </p>
+                )}
+              </div>
+              
+              {/* Copyright */}
+              <p className="text-xs text-center text-muted-foreground">
                 © {new Date().getFullYear()} {brand.name}
               </p>
             </div>
