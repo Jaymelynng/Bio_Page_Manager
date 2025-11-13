@@ -114,20 +114,60 @@ const BrandBioPage = () => {
         className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10"
         style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
-        {/* Hero Section with Enhanced Gradient */}
-        <div 
-          className="relative py-12 px-4"
-          style={{ 
-            background: `linear-gradient(180deg, 
-              ${brand.color}b3 0%, 
-              ${brand.color}d9 50%, 
-              ${secondaryColor}e6 100%)`,
-          }}
-        >
-          <div className="max-w-md mx-auto text-center relative z-10">
-            {/* Logo Circle */}
+        {/* Hero Section with Video Background */}
+        <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+          {brand.hero_video_url ? (
+            <>
+              {/* Blurred background for narrow videos */}
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                preload="metadata"
+                className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
+                src={brand.hero_video_url}
+              />
+              
+              {/* Main video */}
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                preload="metadata"
+                className="absolute inset-0 w-full h-full object-contain"
+                src={brand.hero_video_url}
+              />
+              
+              {/* Gradient overlay with brand colors */}
+              <div 
+                className="absolute inset-0 z-10"
+                style={{
+                  background: `linear-gradient(180deg, 
+                    ${brand.color}b3 0%, 
+                    ${brand.color}d9 50%, 
+                    ${secondaryColor}e6 100%)`
+                }}
+              />
+            </>
+          ) : (
+            /* Fallback gradient if no video */
+            <div 
+              className="absolute inset-0"
+              style={{ 
+                background: `linear-gradient(180deg, 
+                  ${brand.color}b3 0%, 
+                  ${brand.color}d9 50%, 
+                  ${secondaryColor}e6 100%)`
+              }}
+            />
+          )}
+          
+          {/* Content overlay (logo, name, location) */}
+          <div className="relative z-20 h-full flex flex-col items-center justify-center px-4">
             {brand.logo_url && (
-              <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-full flex items-center justify-center p-4 shadow-lg">
+              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center p-4 shadow-2xl mb-4">
                 <img 
                   src={brand.logo_url} 
                   alt={brand.name}
@@ -136,10 +176,10 @@ const BrandBioPage = () => {
               </div>
             )}
             
-            {/* Gym Name */}
-            <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">{brand.name}</h1>
+            <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">
+              {brand.name}
+            </h1>
             
-            {/* Location */}
             {(brand.city || brand.state) && (
               <p className="text-white/95 text-sm drop-shadow-md">
                 {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
