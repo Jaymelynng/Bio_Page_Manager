@@ -50,6 +50,11 @@ const BrandBioPage = () => {
   // Get secondary color or fallback (with safe access)
   const secondaryColor = brand?.color_secondary || brand?.color || '#1f53a3';
   const tertiaryColor = brand?.color_tertiary || '#ffffff';
+  
+  // Conditional hero height for Capital Cedar Park (narrower video)
+  const heroHeight = brand.handle === 'capital-gym-cedar-park' 
+    ? 'h-[280px] md:h-[380px]' 
+    : 'h-[300px] md:h-[400px]';
 
   if (brandLoading) {
     return (
@@ -143,11 +148,11 @@ const BrandBioPage = () => {
 
       {/* White content container */}
       <div 
-        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10"
+        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10 max-h-[85vh] overflow-y-auto"
         style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
         {/* Hero Section with Video Background */}
-        <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+        <div className={`relative ${heroHeight} overflow-hidden`}>
           {brand.hero_video_url ? (
             <>
               {/* Blurred background for narrow videos */}
@@ -221,7 +226,7 @@ const BrandBioPage = () => {
         </div>
 
         {/* Content */}
-        <div className="px-5 pb-8">
+        <div className="px-5 pb-8 pt-4">
         {linksLoading ? (
           <div className="space-y-4 mt-6">
             <Skeleton className="h-14 w-full" />
