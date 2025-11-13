@@ -336,37 +336,34 @@ const BrandBioPage = () => {
                 </h2>
                 <div className="flex justify-center gap-4">
                   {brand.facebook_url && (
-                    <a
-                      href={brand.facebook_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
-                      style={{ borderColor: brand.color }}
-                    >
-                      <Facebook className="w-6 h-6" style={{ color: brand.color }} />
-                    </a>
+            <a
+              href={brand.facebook_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
+            >
+              <Facebook className="w-6 h-6" style={{ color: brand.color }} />
+            </a>
                   )}
                   {brand.instagram_url && (
-                    <a
-                      href={brand.instagram_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
-                      style={{ borderColor: brand.color }}
-                    >
-                      <Instagram className="w-6 h-6" style={{ color: brand.color }} />
-                    </a>
+            <a
+              href={brand.instagram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
+            >
+              <Instagram className="w-6 h-6" style={{ color: brand.color }} />
+            </a>
                   )}
                   {brand.facebook_url && (
-                    <a
-                      href={`https://m.me/${brand.facebook_url.split('/').pop()}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center hover:bg-muted transition-colors"
-                      style={{ borderColor: brand.color }}
-                    >
-                      <MessageCircle className="w-6 h-6" style={{ color: brand.color }} />
-                    </a>
+            <a
+              href={`https://m.me/${brand.facebook_url.split('/').pop()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
+            >
+              <MessageCircle className="w-6 h-6" style={{ color: brand.color }} />
+            </a>
                   )}
                 </div>
               </>
