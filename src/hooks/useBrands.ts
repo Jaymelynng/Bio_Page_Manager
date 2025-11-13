@@ -22,7 +22,7 @@ export const useBrands = () => {
 
 export const useBrand = (handle: string) => {
   return useQuery({
-    queryKey: ["brand", handle],
+    queryKey: ["brand", handle, "v2"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brands")
