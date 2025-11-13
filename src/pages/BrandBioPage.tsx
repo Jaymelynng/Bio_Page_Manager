@@ -15,9 +15,9 @@ const BrandBioPage = () => {
     window.open(url, "_blank");
   };
 
-  // Get secondary color or fallback
-  const secondaryColor = brand.color_secondary || brand.color;
-  const tertiaryColor = brand.color_tertiary || '#ffffff';
+  // Get secondary color or fallback (with safe access)
+  const secondaryColor = brand?.color_secondary || brand?.color || '#1f53a3';
+  const tertiaryColor = brand?.color_tertiary || '#ffffff';
 
   if (brandLoading) {
     return (
