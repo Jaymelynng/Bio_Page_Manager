@@ -35,42 +35,9 @@ const Index = () => {
         {/* Animated background GIF */}
         <img 
           src={biohubBg} 
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
+          alt="BioHub - Gym Bio Link Manager"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
-        
-        {/* Subtle animated orbs */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div 
-            className="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] rounded-full opacity-15 blur-3xl animate-pulse"
-            style={{ background: 'radial-gradient(circle, hsl(0 20% 70%) 0%, transparent 70%)' }}
-          />
-          <div 
-            className="absolute -bottom-1/2 -right-1/4 w-[600px] h-[600px] rounded-full opacity-15 blur-3xl animate-pulse"
-            style={{ background: 'radial-gradient(circle, hsl(225 15% 80%) 0%, transparent 70%)', animationDelay: '1s' }}
-          />
-        </div>
-        
-        <div className="relative container mx-auto px-4 py-16 md:py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-white/30 mb-6 animate-fade-in backdrop-blur-sm">
-              <Layout className="w-4 h-4 text-white" />
-              <span className="text-sm font-medium text-white">Admin Dashboard</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 animate-fade-in tracking-tight">
-              BioHub
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white/80 mb-2 animate-fade-in font-medium">
-              Gym Bio Link Manager
-            </p>
-            
-            <p className="text-lg text-white/60 max-w-xl animate-fade-in">
-              Manage all {activeBrands} gym bio link pages from one place
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Stats Overview */}
