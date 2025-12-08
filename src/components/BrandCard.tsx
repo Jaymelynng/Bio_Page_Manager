@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Eye, MousePointerClick, TrendingUp, ExternalLink } from "lucide-react";
+import { BarChart3, Eye, MousePointerClick, TrendingUp, ExternalLink, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BrandCardProps {
@@ -95,7 +95,19 @@ export const BrandCard = ({
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 rounded-xl border-2 transition-all duration-300"
+            style={{ 
+              borderColor: `${color}30`,
+            }}
+            onClick={() => navigate(`/admin/edit/${handle}`)}
+          >
+            <Pencil className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -117,7 +129,7 @@ export const BrandCard = ({
             onClick={() => navigate(`/${handle}`)}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
-            View Page
+            View
           </Button>
         </div>
       </div>

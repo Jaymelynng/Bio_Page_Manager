@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import BrandBioPage from "./pages/BrandBioPage";
 import NotFound from "./pages/NotFound";
 import AdminVideoUpload from "./pages/AdminVideoUpload";
+import AdminEditGym from "./pages/AdminEditGym";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -33,6 +34,14 @@ const App = () => (
             element={
               <ProtectedRoute requireAdmin>
                 <AdminVideoUpload />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/edit/:handle" 
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminEditGym />
               </ProtectedRoute>
             } 
           />
