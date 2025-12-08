@@ -11,7 +11,7 @@ interface StatsCardProps {
 
 export const StatsCard = ({ title, value, change, icon: Icon, trend }: StatsCardProps) => {
   return (
-    <Card className="relative overflow-hidden bg-card border-border p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 animate-fade-in group">
+    <Card className="relative overflow-hidden bg-white/90 backdrop-blur-sm border-border/50 p-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 animate-fade-in group">
       {/* Warm gradient accent bar */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-accent opacity-80" />
       
