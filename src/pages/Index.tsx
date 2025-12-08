@@ -23,7 +23,7 @@ const Index = () => {
         <img 
           src={gymbioHero} 
           alt="Gym Bio Link Manager"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
       </div>
 
