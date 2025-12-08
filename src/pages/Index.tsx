@@ -3,7 +3,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart3, Users, TrendingUp, Link2, Layout } from "lucide-react";
 import { useBrands } from "@/hooks/useBrands";
-import biohubBg from "@/assets/biohub-bg.gif";
+import gymbioHero from "@/assets/gymbio-hero.png";
 
 const Index = () => {
   const { data: brands, isLoading } = useBrands();
@@ -21,8 +21,8 @@ const Index = () => {
       {/* Hero Section - Full GIF Background */}
       <div className="relative overflow-hidden h-[280px] md:h-[350px]">
         <img 
-          src={biohubBg} 
-          alt="BioHub - Gym Bio Link Manager"
+          src={gymbioHero} 
+          alt="Gym Bio Link Manager"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         />
       </div>
