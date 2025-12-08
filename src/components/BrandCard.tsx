@@ -28,7 +28,7 @@ export const BrandCard = ({
   const secondaryColor = colorSecondary || color;
 
   return (
-    <Card className="group relative overflow-hidden bg-card border-border rounded-2xl shadow-card hover:shadow-elevated transition-all duration-500 hover:-translate-y-2 animate-fade-in">
+    <Card className="group relative overflow-hidden bg-white/95 backdrop-blur-sm border-border/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in">
       {/* Gradient top bar using gym's brand colors */}
       <div 
         className="absolute top-0 left-0 w-full h-1.5 transition-all duration-300 group-hover:h-2"

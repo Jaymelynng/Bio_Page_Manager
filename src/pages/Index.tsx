@@ -17,22 +17,9 @@ const Index = () => {
   const activeBrands = brands?.length || 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Subtle warm mesh gradient background */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-50"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 30%, hsl(0 20% 63% / 0.06) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 70%, hsl(225 15% 73% / 0.06) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, hsl(20 20% 80% / 0.05) 0%, transparent 40%)
-          `
-        }}
-      />
-
-      {/* Hero Section - warm neutral gradient */}
-      <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-[#737373] via-[#737373] to-[#adb2c6]">
-        {/* Animated background GIF */}
+    <div className="min-h-screen bg-gradient-to-b from-[#d6c5bf] via-[#e6e6e6] to-[#c3a5a5]">
+      {/* Hero Section - Full GIF Background */}
+      <div className="relative overflow-hidden h-[280px] md:h-[350px]">
         <img 
           src={biohubBg} 
           alt="BioHub - Gym Bio Link Manager"
