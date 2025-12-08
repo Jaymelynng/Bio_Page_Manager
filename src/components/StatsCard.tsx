@@ -11,17 +11,20 @@ interface StatsCardProps {
 
 export const StatsCard = ({ title, value, change, icon: Icon, trend }: StatsCardProps) => {
   return (
-    <Card className="bg-gradient-card border-border p-6 hover:border-primary/50 transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.15)] animate-fade-in">
+    <Card className="relative overflow-hidden bg-card border-border p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1 animate-fade-in group">
+      {/* Gradient accent bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-80" />
+      
       <div className="flex items-center justify-between">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold text-foreground">{value}</p>
-          <p className={`text-xs font-medium ${trend === 'up' ? 'text-primary' : 'text-destructive'}`}>
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+          <p className="text-4xl font-bold text-foreground">{value}</p>
+          <p className={`text-sm font-medium ${trend === 'up' ? 'text-primary' : 'text-destructive'}`}>
             {change}
           </p>
         </div>
-        <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-          <Icon className="w-7 h-7 text-primary" />
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform duration-300">
+          <Icon className="w-8 h-8 text-primary-foreground" />
         </div>
       </div>
     </Card>

@@ -1,9 +1,7 @@
 import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Brain, BarChart3, Users, TrendingUp, Sparkles, Plus } from "lucide-react";
-import gymHero from "@/assets/gym-hero.jpg";
+import { BarChart3, Users, TrendingUp, Link2, Layout } from "lucide-react";
 import { useBrands } from "@/hooks/useBrands";
 
 const Index = () => {
@@ -19,56 +17,62 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Decorative mesh gradient background */}
+      <div 
+        className="fixed inset-0 pointer-events-none opacity-60"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 30%, hsl(175 65% 40% / 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 70%, hsl(260 55% 50% / 0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 100%, hsl(175 65% 40% / 0.05) 0%, transparent 40%)
+          `
+        }}
+      />
+
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-hero border-b border-border">
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url(${gymHero})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/80 to-background" />
+      <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-foreground via-foreground to-secondary">
+        {/* Animated gradient orbs */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div 
+            className="absolute -top-1/2 -left-1/4 w-[800px] h-[800px] rounded-full opacity-20 blur-3xl animate-pulse"
+            style={{ background: 'radial-gradient(circle, hsl(175 65% 50%) 0%, transparent 70%)' }}
+          />
+          <div 
+            className="absolute -bottom-1/2 -right-1/4 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-pulse"
+            style={{ background: 'radial-gradient(circle, hsl(260 55% 60%) 0%, transparent 70%)', animationDelay: '1s' }}
+          />
+        </div>
         
-        <div className="relative container mx-auto px-4 py-16">
-          <div className="max-w-4xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6 animate-fade-in">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">AI-Powered Multi-Brand Hub</span>
+        <div className="relative container mx-auto px-4 py-16 md:py-20">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-6 animate-fade-in backdrop-blur-sm">
+              <Layout className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Admin Dashboard</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 animate-fade-in">
-              Smart Bio Links
-              <span className="block text-primary mt-2">That Convert</span>
+            <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground mb-4 animate-fade-in tracking-tight">
+              BioHub
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl animate-fade-in">
-              Manage 10 fitness brands with AI-optimized link pages. Increase conversions with intelligent insights and personalized CTAs.
+            <p className="text-xl md:text-2xl text-primary-foreground/70 mb-2 animate-fade-in font-medium">
+              Gym Bio Link Manager
             </p>
             
-            <div className="flex flex-wrap gap-4 animate-fade-in">
-              <Button size="lg" variant="premium" className="gap-2">
-                <Brain className="w-5 h-5" />
-                View AI Insights
-              </Button>
-              <Button size="lg" variant="outline" className="gap-2">
-                <Plus className="w-5 h-5" />
-                Add New Brand
-              </Button>
-            </div>
+            <p className="text-lg text-primary-foreground/50 max-w-xl animate-fade-in">
+              Manage all {activeBrands} gym bio link pages from one place
+            </p>
           </div>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="container mx-auto px-4 -mt-12 relative z-10 mb-12">
+      <div className="container mx-auto px-4 -mt-10 relative z-10 mb-12">
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
-            <Skeleton className="h-32" />
+            <Skeleton className="h-36 rounded-2xl" />
+            <Skeleton className="h-36 rounded-2xl" />
+            <Skeleton className="h-36 rounded-2xl" />
+            <Skeleton className="h-36 rounded-2xl" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -87,17 +91,17 @@ const Index = () => {
               trend="up"
             />
             <StatsCard
-              title="Active Brands"
+              title="Active Gyms"
               value={activeBrands.toString()}
-              change="All brands optimized"
+              change="All pages live"
               icon={Users}
               trend="up"
             />
             <StatsCard
               title="Total Links"
               value={totalLinks.toString()}
-              change="Across all brands"
-              icon={Brain}
+              change="Across all gyms"
+              icon={Link2}
               trend="up"
             />
           </div>
@@ -105,22 +109,22 @@ const Index = () => {
       </div>
 
       {/* Brands Grid */}
-      <div className="container mx-auto px-4 pb-16">
+      <div className="container mx-auto px-4 pb-16 relative z-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Your Brands</h2>
-            <p className="text-muted-foreground">Manage and optimize all your fitness brand bio links</p>
+            <h2 className="text-3xl font-bold text-foreground mb-2">Your Gyms</h2>
+            <p className="text-muted-foreground">All {activeBrands} gym bio link pages</p>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Skeleton className="h-64" />
-            <Skeleton className="h-64" />
-            <Skeleton className="h-64" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Skeleton className="h-72 rounded-2xl" />
+            <Skeleton className="h-72 rounded-2xl" />
+            <Skeleton className="h-72 rounded-2xl" />
           </div>
         ) : brands && brands.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {brands.map((brand: any) => (
               <BrandCard 
                 key={brand.id} 
@@ -135,7 +139,7 @@ const Index = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No brands found.</p>
+            <p className="text-muted-foreground">No gyms found.</p>
           </div>
         )}
       </div>
