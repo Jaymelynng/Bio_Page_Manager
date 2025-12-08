@@ -32,11 +32,11 @@ const Index = () => {
 
       {/* Hero Section - warm neutral gradient */}
       <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-[#737373] via-[#737373] to-[#adb2c6]">
-        {/* Subtle animated background GIF */}
+        {/* Animated background GIF */}
         <img 
           src={biohubBg} 
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-[0.12] mix-blend-overlay pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-40 pointer-events-none"
         />
         
         {/* Subtle animated orbs */}
