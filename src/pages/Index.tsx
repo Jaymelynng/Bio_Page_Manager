@@ -1,12 +1,27 @@
 import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, Users, TrendingUp, Link2, Layout } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { BarChart3, Users, TrendingUp, Link2, LogOut } from "lucide-react";
 import { useBrands } from "@/hooks/useBrands";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import biohubHero from "@/assets/biohub-hero.png";
-
 const Index = () => {
   const { data: brands, isLoading } = useBrands();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: 'Error signing out',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Calculate aggregate stats from all brands
   const totalClicks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_clicks || 0), 0) || 0;
@@ -18,6 +33,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#d6c5bf] via-[#e6e6e6] to-[#c3a5a5]">
+      {/* Header with Logout */}
+      <div className="absolute top-4 right-4 z-20">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleLogout}
+          className="bg-background/80 backdrop-blur-sm hover:bg-background"
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          Sign Out
+        </Button>
+      </div>
+
       {/* Hero Section - Full GIF Background */}
       <div className="relative overflow-hidden h-[280px] md:h-[350px]">
         <img 
