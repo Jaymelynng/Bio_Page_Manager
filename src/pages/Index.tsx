@@ -28,7 +28,7 @@ const Index = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="container mx-auto px-4 -mt-10 relative z-10 mb-12">
+      <div className="container mx-auto px-4 mt-6 relative z-10 mb-12">
         {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Skeleton className="h-36 rounded-2xl" />
