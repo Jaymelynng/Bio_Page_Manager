@@ -8,61 +8,66 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 30% 15%;
+    /* Warm dusty rose + neutral palette */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 25%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 30% 15%;
+    --card-foreground: 0 0% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 30% 15%;
+    --popover-foreground: 0 0% 25%;
 
-    --primary: 175 65% 40%;
+    /* Dusty rose primary */
+    --primary: 0 20% 63%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 55% 50%;
+    /* Neutral gray secondary */
+    --secondary: 0 0% 45%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 10% 45%;
+    /* Muted warm tones */
+    --muted: 220 14% 91%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 260 55% 50%;
-    --accent-foreground: 0 0% 100%;
+    /* Blue-gray accent */
+    --accent: 225 15% 73%;
+    --accent-foreground: 0 0% 25%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 175 65% 40%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 20% 63%;
 
     --radius: 0.75rem;
 
-    /* Enhanced gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(175 65% 40%), hsl(260 55% 50%));
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 20% 98%));
-    --gradient-hero: linear-gradient(135deg, hsl(220 30% 15%), hsl(260 55% 35%));
-    --gradient-mesh: radial-gradient(ellipse at 20% 30%, hsl(175 65% 40% / 0.15) 0%, transparent 50%),
-                     radial-gradient(ellipse at 80% 70%, hsl(260 55% 50% / 0.15) 0%, transparent 50%);
+    /* Warm neutral gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 20% 63%), hsl(0 19% 70%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(20 20% 96%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 25%), hsl(0 0% 35%));
+    --gradient-mesh: radial-gradient(ellipse at 20% 30%, hsl(0 20% 63% / 0.1) 0%, transparent 50%),
+                     radial-gradient(ellipse at 80% 70%, hsl(225 15% 73% / 0.1) 0%, transparent 50%);
     
-    /* Enhanced shadows */
-    --shadow-soft: 0 2px 8px hsl(220 30% 15% / 0.06);
-    --shadow-card: 0 8px 30px hsl(220 30% 15% / 0.12);
-    --shadow-card-hover: 0 20px 50px hsl(220 30% 15% / 0.18);
-    --shadow-elevated: 0 25px 60px hsl(220 30% 15% / 0.2);
-    --shadow-glow: 0 0 40px hsl(175 65% 40% / 0.3);
-    --shadow-glow-accent: 0 0 40px hsl(260 55% 50% / 0.3);
+    /* Enhanced shadows - warm tones */
+    --shadow-soft: 0 2px 8px hsl(0 0% 0% / 0.05);
+    --shadow-card: 0 8px 30px hsl(0 10% 40% / 0.1);
+    --shadow-card-hover: 0 20px 50px hsl(0 10% 40% / 0.15);
+    --shadow-elevated: 0 25px 60px hsl(0 10% 40% / 0.18);
+    --shadow-glow: 0 0 40px hsl(0 20% 63% / 0.25);
+    --shadow-glow-accent: 0 0 40px hsl(225 15% 73% / 0.25);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 30% 15%;
-    --sidebar-primary: 175 65% 40%;
+    --sidebar-foreground: 0 0% 25%;
+    --sidebar-primary: 0 20% 63%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 15% 96%;
-    --sidebar-accent-foreground: 220 30% 15%;
-    --sidebar-border: 220 15% 88%;
-    --sidebar-ring: 175 65% 40%;
+    --sidebar-accent: 20 20% 96%;
+    --sidebar-accent-foreground: 0 0% 25%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 20% 63%;
   }
 }
 
