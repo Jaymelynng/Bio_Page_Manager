@@ -95,41 +95,41 @@ export const BrandCard = ({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 rounded-xl border-2 transition-all duration-300"
+            className="flex-1 min-w-[70px] rounded-xl border-2 transition-all duration-300"
             style={{ 
               borderColor: `${color}30`,
             }}
             onClick={() => navigate(`/admin/edit/${handle}`)}
           >
-            <Pencil className="w-4 h-4 mr-2" />
+            <Pencil className="w-4 h-4 mr-1" />
             Edit
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 rounded-xl border-2 transition-all duration-300"
+            className="flex-1 min-w-[90px] rounded-xl border-2 transition-all duration-300"
             style={{ 
               borderColor: `${color}30`,
             }}
             onClick={() => navigate(`/admin/analytics/${handle}`)}
           >
-            <BarChart3 className="w-4 h-4 mr-2" />
-            Analytics
+            <BarChart3 className="w-4 h-4 mr-1" />
+            Stats
           </Button>
           <Button 
             size="sm" 
-            className="flex-1 rounded-xl text-white hover:opacity-90 transition-all duration-300 shadow-lg"
+            className="flex-1 min-w-[70px] rounded-xl text-white hover:opacity-90 transition-all duration-300 shadow-lg"
             style={{ 
               background: `linear-gradient(135deg, ${color} 0%, ${secondaryColor} 100%)`,
               boxShadow: `0 4px 15px ${color}40`
             }}
             onClick={() => navigate(`/biopage/${handle}`)}
           >
-            <ExternalLink className="w-4 h-4 mr-2" />
+            <ExternalLink className="w-4 h-4 mr-1" />
             View
           </Button>
         </div>
