@@ -103,7 +103,7 @@ export const BrandCard = ({
             style={{ 
               borderColor: `${color}30`,
             }}
-            onClick={() => navigate(`/admin/edit/${handle}`)}
+            onClick={() => navigate(`/biopage/admin/edit/${handle}`)}
           >
             <Pencil className="w-4 h-4 mr-1" />
             Edit
@@ -115,7 +115,7 @@ export const BrandCard = ({
             style={{ 
               borderColor: `${color}30`,
             }}
-            onClick={() => navigate(`/admin/analytics/${handle}`)}
+            onClick={() => navigate(`/biopage/admin/analytics/${handle}`)}
           >
             <BarChart3 className="w-4 h-4 mr-1" />
             Stats

@@ -74,7 +74,7 @@ export default function AdminEditGym() {
       if (brandError) throw brandError;
       if (!brandData) {
         toast({ title: 'Gym not found', variant: 'destructive' });
-        navigate('/');
+        navigate('/biopage');
         return;
       }
 
@@ -219,7 +219,7 @@ export default function AdminEditGym() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="icon" onClick={() => navigate('/')}>
+            <Button variant="outline" size="icon" onClick={() => navigate('/biopage')}>
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
@@ -227,7 +227,7 @@ export default function AdminEditGym() {
               <p className="text-muted-foreground">/{brand.handle}</p>
             </div>
           </div>
-          <Link to={`/${brand.handle}`} target="_blank">
+          <Link to={`/biopage/${brand.handle}`} target="_blank">
             <Button variant="outline" size="sm">
               <ExternalLink className="h-4 w-4 mr-2" />
               View Page

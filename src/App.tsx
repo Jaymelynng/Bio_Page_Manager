@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import BrandBioPage from "./pages/BrandBioPage";
 import NotFound from "./pages/NotFound";
@@ -21,9 +21,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Protected admin routes */}
+          {/* Redirect root to /biopage */}
+          <Route path="/" element={<Navigate to="/biopage" replace />} />
+          
+          {/* Protected admin routes - all under /biopage */}
           <Route 
-            path="/" 
+            path="/biopage" 
             element={
               <ProtectedRoute requireAdmin>
                 <Index />
@@ -31,7 +34,7 @@ const App = () => (
             } 
           />
           <Route 
-            path="/admin/upload-videos" 
+            path="/biopage/admin/upload-videos" 
             element={
               <ProtectedRoute requireAdmin>
                 <AdminVideoUpload />
@@ -39,7 +42,7 @@ const App = () => (
             } 
           />
           <Route 
-            path="/admin/edit/:handle" 
+            path="/biopage/admin/edit/:handle" 
             element={
               <ProtectedRoute requireAdmin>
                 <AdminEditGym />
@@ -47,7 +50,7 @@ const App = () => (
             } 
           />
           <Route 
-            path="/admin/analytics/:handle" 
+            path="/biopage/admin/analytics/:handle" 
             element={
               <ProtectedRoute requireAdmin>
                 <AdminAnalytics />
@@ -56,7 +59,7 @@ const App = () => (
           />
           
           {/* Auth page */}
-          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/biopage/auth" element={<AuthPage />} />
           
           {/* Public gym pages */}
           <Route path="/biopage/:handle" element={<BrandBioPage />} />

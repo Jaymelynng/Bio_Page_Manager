@@ -19,7 +19,7 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/biopage/auth" replace />;
   }
 
   if (requireAdmin && !isAdmin) {

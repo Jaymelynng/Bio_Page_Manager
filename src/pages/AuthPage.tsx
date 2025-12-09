@@ -31,7 +31,7 @@ export default function AuthPage() {
   // Redirect if already logged in and is admin
   useEffect(() => {
     if (!loading && user && isAdmin) {
-      navigate('/');
+      navigate('/biopage');
     }
   }, [user, isAdmin, loading, navigate]);
 
