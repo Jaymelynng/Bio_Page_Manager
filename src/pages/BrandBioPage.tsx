@@ -1,17 +1,25 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
 import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail, BookOpen, Target, Moon, Star, PartyPopper, User } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 const BrandBioPage = () => {
   const { handle } = useParams<{ handle: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { data: brand, isLoading: brandLoading } = useBrand(handle || "");
   const { data: links, isLoading: linksLoading } = useBrandLinks(brand?.id || "");
   const trackClick = useTrackLinkClick();
   const [isShiftStarActive, setIsShiftStarActive] = useState(false);
+
+  // Capture UTM parameters from URL
+  const utmParams = useMemo(() => ({
+    source: searchParams.get('utm_source'),
+    medium: searchParams.get('utm_medium'),
+    campaign: searchParams.get('utm_campaign'),
+  }), [searchParams]);
 
   // Set dynamic page title for individual gym pages
   useEffect(() => {
@@ -53,7 +61,12 @@ const BrandBioPage = () => {
       return;
     }
     
-    trackClick.mutate(linkId);
+    trackClick.mutate({
+      brandLinkId: linkId,
+      utmSource: utmParams.source,
+      utmMedium: utmParams.medium,
+      utmCampaign: utmParams.campaign,
+    });
     window.open(url, "_blank");
   };
 

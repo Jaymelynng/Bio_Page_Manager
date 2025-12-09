@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import AdminVideoUpload from "./pages/AdminVideoUpload";
 import AdminEditGym from "./pages/AdminEditGym";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminLinkGenerator from "./pages/AdminLinkGenerator";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -54,6 +55,14 @@ const App = () => (
             element={
               <ProtectedRoute requireAdmin>
                 <AdminAnalytics />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/biopage/admin/link-generator" 
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminLinkGenerator />
               </ProtectedRoute>
             } 
           />

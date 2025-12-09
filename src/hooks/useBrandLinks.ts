@@ -22,13 +22,23 @@ export const useBrandLinks = (brandId: string) => {
   });
 };
 
+interface TrackClickData {
+  brandLinkId: string;
+  utmSource?: string | null;
+  utmMedium?: string | null;
+  utmCampaign?: string | null;
+}
+
 export const useTrackLinkClick = () => {
   return useMutation({
-    mutationFn: async (linkId: string) => {
+    mutationFn: async (data: TrackClickData) => {
       const { error } = await supabase.from("link_analytics").insert({
-        brand_link_id: linkId,
+        brand_link_id: data.brandLinkId,
         user_agent: navigator.userAgent,
         referrer: document.referrer || null,
+        utm_source: data.utmSource,
+        utm_medium: data.utmMedium,
+        utm_campaign: data.utmCampaign,
       });
 
       if (error) throw error;
