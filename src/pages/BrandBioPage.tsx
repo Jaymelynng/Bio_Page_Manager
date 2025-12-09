@@ -13,6 +13,16 @@ const BrandBioPage = () => {
   const trackClick = useTrackLinkClick();
   const [isShiftStarActive, setIsShiftStarActive] = useState(false);
 
+  // Set dynamic page title for individual gym pages
+  useEffect(() => {
+    if (brand?.name) {
+      document.title = `${brand.name} | BioHub`;
+    }
+    return () => {
+      document.title = 'BioHub - Gym Bio Links';
+    };
+  }, [brand?.name]);
+
   // Secret combo: Shift + * (8)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
