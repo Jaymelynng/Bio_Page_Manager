@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, MousePointerClick, TrendingUp, Link2, Calendar, Globe, Smartphone } from "lucide-react";
+import { ArrowLeft, MousePointerClick, TrendingUp, Link2, Calendar, Globe, Smartphone, Tag } from "lucide-react";
 
 const AdminAnalytics = () => {
   const { handle } = useParams();
@@ -108,6 +108,17 @@ const AdminAnalytics = () => {
     .map(([source, count]) => ({ source, count: count as number }))
     .sort((a, b) => b.count - a.count);
 
+  // Calculate UTM campaign sources
+  const campaignSources = analytics?.reduce((acc: Record<string, number>, click: any) => {
+    const source = click.utm_source || 'No UTM';
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {}) || {};
+
+  const topCampaigns = Object.entries(campaignSources)
+    .map(([source, count]) => ({ source, count: count as number }))
+    .sort((a, b) => b.count - a.count);
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('en-US', {
       month: 'short',
@@ -204,7 +215,7 @@ const AdminAnalytics = () => {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
               {/* Top Links */}
               <Card className="p-6 bg-background/95 backdrop-blur-sm">
                 <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
@@ -262,6 +273,38 @@ const AdminAnalytics = () => {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No source data yet</p>
+                )}
+              </Card>
+
+              {/* Campaign Sources (UTM) */}
+              <Card className="p-6 bg-background/95 backdrop-blur-sm">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Tag className="w-5 h-5" style={{ color: brand?.color }} />
+                  Campaign Sources
+                </h3>
+                {topCampaigns.length > 0 ? (
+                  <div className="space-y-3">
+                    {topCampaigns.map((src) => (
+                      <div key={src.source} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-3">
+                          <span 
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                            style={{ backgroundColor: `${brand?.color}20`, color: brand?.color }}
+                          >
+                            {src.source === 'instagram' ? '📸' : 
+                             src.source === 'facebook' ? '📘' : 
+                             src.source === 'email' ? '📧' : 
+                             src.source === 'messenger' ? '💬' : 
+                             src.source === 'No UTM' ? '❓' : '🏷️'}
+                          </span>
+                          <span className="font-medium text-sm capitalize">{src.source}</span>
+                        </div>
+                        <span className="text-muted-foreground text-sm">{src.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">No campaign data yet</p>
                 )}
               </Card>
 
