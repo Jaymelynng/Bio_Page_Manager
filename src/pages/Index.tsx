@@ -2,13 +2,14 @@ import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, TrendingUp, Link2, LogOut } from "lucide-react";
+import { BarChart3, Users, TrendingUp, Link2, LogOut, RefreshCw } from "lucide-react";
 import { useBrands } from "@/hooks/useBrands";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import biohubHero from "@/assets/biohub-hero.png";
+
 const Index = () => {
-  const { data: brands, isLoading } = useBrands();
+  const { data: brands, isLoading, refetch, isFetching } = useBrands();
   const { signOut, user } = useAuth();
   const { toast } = useToast();
 
@@ -105,6 +106,16 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-foreground mb-2">Your Gyms</h2>
             <p className="text-muted-foreground">All {activeBrands} gym bio link pages</p>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="bg-background/80 backdrop-blur-sm hover:bg-background"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+            {isFetching ? 'Refreshing...' : 'Refresh Stats'}
+          </Button>
         </div>
 
         {isLoading ? (

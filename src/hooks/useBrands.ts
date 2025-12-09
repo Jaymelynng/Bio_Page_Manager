@@ -17,6 +17,8 @@ export const useBrands = () => {
       if (error) throw error;
       return data;
     },
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnWindowFocus: true,
   });
 };
 
