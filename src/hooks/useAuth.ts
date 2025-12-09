@@ -60,11 +60,19 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = true) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    // Store email for convenience if remember me is checked
+    if (!error && rememberMe) {
+      localStorage.setItem('biohub_remembered_email', email);
+    } else if (!rememberMe) {
+      localStorage.removeItem('biohub_remembered_email');
+    }
+    
     return { error };
   };
 
