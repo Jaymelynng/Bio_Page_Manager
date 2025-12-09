@@ -87,6 +87,27 @@ const AdminAnalytics = () => {
     return acc;
   }, { mobile: 0, desktop: 0 }) || { mobile: 0, desktop: 0 };
 
+  // Calculate traffic sources from referrer
+  const trafficSources = analytics?.reduce((acc: Record<string, number>, click: any) => {
+    let source = 'Direct';
+    const ref = click.referrer?.toLowerCase() || '';
+    
+    if (ref.includes('instagram')) source = 'Instagram';
+    else if (ref.includes('facebook') || ref.includes('fb.com')) source = 'Facebook';
+    else if (ref.includes('google')) source = 'Google';
+    else if (ref.includes('tiktok')) source = 'TikTok';
+    else if (ref.includes('twitter') || ref.includes('x.com')) source = 'X/Twitter';
+    else if (ref.includes('linktr.ee')) source = 'Linktree';
+    else if (ref && ref !== '') source = 'Other';
+    
+    acc[source] = (acc[source] || 0) + 1;
+    return acc;
+  }, {}) || {};
+
+  const topSources = Object.entries(trafficSources)
+    .map(([source, count]) => ({ source, count: count as number }))
+    .sort((a, b) => b.count - a.count);
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('en-US', {
       month: 'short',
@@ -183,7 +204,7 @@ const AdminAnalytics = () => {
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Top Links */}
               <Card className="p-6 bg-background/95 backdrop-blur-sm">
                 <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
@@ -201,14 +222,46 @@ const AdminAnalytics = () => {
                           >
                             {i + 1}
                           </span>
-                          <span className="font-medium">{link.title}</span>
+                          <span className="font-medium text-sm">{link.title}</span>
                         </div>
-                        <span className="text-muted-foreground">{link.count} clicks</span>
+                        <span className="text-muted-foreground text-sm">{link.count}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-8">No click data yet</p>
+                )}
+              </Card>
+
+              {/* Traffic Sources */}
+              <Card className="p-6 bg-background/95 backdrop-blur-sm">
+                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Globe className="w-5 h-5" style={{ color: brand?.color }} />
+                  Traffic Sources
+                </h3>
+                {topSources.length > 0 ? (
+                  <div className="space-y-3">
+                    {topSources.map((src, i) => (
+                      <div key={src.source} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                        <div className="flex items-center gap-3">
+                          <span 
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                            style={{ backgroundColor: `${brand?.color}20`, color: brand?.color }}
+                          >
+                            {src.source === 'Instagram' ? '📸' : 
+                             src.source === 'Facebook' ? '📘' : 
+                             src.source === 'Direct' ? '🔗' : 
+                             src.source === 'Google' ? '🔍' : 
+                             src.source === 'TikTok' ? '🎵' : '🌐'}
+                          </span>
+                          <span className="font-medium text-sm">{src.source}</span>
+                        </div>
+                        <span className="text-muted-foreground text-sm">{src.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-8">No source data yet</p>
                 )}
               </Card>
 
@@ -226,7 +279,7 @@ const AdminAnalytics = () => {
                         <span>Mobile</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
                           <div 
                             className="h-full rounded-full"
                             style={{ 
@@ -235,7 +288,7 @@ const AdminAnalytics = () => {
                             }}
                           />
                         </div>
-                        <span className="text-sm text-muted-foreground w-12 text-right">
+                        <span className="text-sm text-muted-foreground w-8 text-right">
                           {deviceBreakdown.mobile}
                         </span>
                       </div>
@@ -246,7 +299,7 @@ const AdminAnalytics = () => {
                         <span>Desktop</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-32 h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
                           <div 
                             className="h-full rounded-full"
                             style={{ 
@@ -255,7 +308,7 @@ const AdminAnalytics = () => {
                             }}
                           />
                         </div>
-                        <span className="text-sm text-muted-foreground w-12 text-right">
+                        <span className="text-sm text-muted-foreground w-8 text-right">
                           {deviceBreakdown.desktop}
                         </span>
                       </div>
