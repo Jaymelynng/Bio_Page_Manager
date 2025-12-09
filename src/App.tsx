@@ -50,7 +50,7 @@ const App = () => (
           <Route path="/auth" element={<AuthPage />} />
           
           {/* Public gym pages */}
-          <Route path="/linkconnect/:handle" element={<BrandBioPage />} />
+          <Route path="/biopage/:handle" element={<BrandBioPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
