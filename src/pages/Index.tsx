@@ -2,7 +2,20 @@ import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, Link2, LogOut, RefreshCw, LinkIcon, MousePointerClick } from "lucide-react";
+import { BarChart3, Users, Link2, LogOut, RefreshCw, LinkIcon, MousePointerClick, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +29,31 @@ const Index = () => {
   const { signOut, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleClearAllStats = async () => {
+    setIsClearing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('clear-analytics');
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Stats cleared',
+        description: 'All analytics have been reset to zero.',
+      });
+      
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: 'Error clearing stats',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   const handleLogout = async () => {
     const { error } = await signOut();
@@ -115,6 +153,36 @@ const Index = () => {
             <p className="text-muted-foreground">All {activeBrands} gym bio link pages</p>
           </div>
           <div className="flex gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="bg-background/80 backdrop-blur-sm hover:bg-destructive/10 border-destructive/50 text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear Stats
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear All Analytics?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all click analytics for all gyms. Stats will be reset to zero. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={handleClearAllStats}
+                    disabled={isClearing}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isClearing ? 'Clearing...' : 'Yes, Clear All Stats'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button 
               variant="outline" 
               size="sm" 
