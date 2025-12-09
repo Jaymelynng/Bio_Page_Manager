@@ -2,3 +2,6 @@ project_id = "qfffsgiopzpwcijdkvcv"
 
 [functions.update-brand-video]
 verify_jwt = false
+
+[functions.clear-analytics]
+verify_jwt = false
