@@ -115,6 +115,7 @@ export const BrandCard = ({
             style={{ 
               borderColor: `${color}30`,
             }}
+            onClick={() => navigate(`/admin/analytics/${handle}`)}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             Analytics
