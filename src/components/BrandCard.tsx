@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Eye, MousePointerClick, TrendingUp, ExternalLink, Pencil } from "lucide-react";
+import { BarChart3, Eye, MousePointerClick, ExternalLink, Pencil, Instagram, Facebook, Mail, MessageCircle, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface BrandCardProps {
@@ -10,7 +10,7 @@ interface BrandCardProps {
   colorSecondary?: string;
   links: number;
   clicks: number;
-  conversionRate: number;
+  topSource?: string | null;
   logoUrl?: string;
 }
 
@@ -21,11 +21,32 @@ export const BrandCard = ({
   colorSecondary,
   links, 
   clicks, 
-  conversionRate,
+  topSource,
   logoUrl
 }: BrandCardProps) => {
   const navigate = useNavigate();
   const secondaryColor = colorSecondary || color;
+
+  const getSourceIcon = (source: string | null | undefined) => {
+    if (!source) return <Globe className="w-4 h-4" />;
+    const s = source.toLowerCase();
+    if (s.includes('instagram')) return <Instagram className="w-4 h-4" />;
+    if (s.includes('facebook')) return <Facebook className="w-4 h-4" />;
+    if (s.includes('email')) return <Mail className="w-4 h-4" />;
+    if (s.includes('messenger')) return <MessageCircle className="w-4 h-4" />;
+    return <Globe className="w-4 h-4" />;
+  };
+
+  const formatSource = (source: string | null | undefined) => {
+    if (!source) return '—';
+    const s = source.toLowerCase();
+    if (s.includes('instagram')) return 'IG';
+    if (s.includes('facebook')) return 'FB';
+    if (s.includes('email')) return 'Email';
+    if (s.includes('messenger')) return 'Msg';
+    if (s === 'direct' || s === 'no utm') return 'Direct';
+    return source.slice(0, 6);
+  };
 
   return (
     <Card className="group relative overflow-hidden bg-white/95 backdrop-blur-sm border-border/50 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 animate-fade-in">
@@ -88,10 +109,10 @@ export const BrandCard = ({
           </div>
           <div className="space-y-1 text-center">
             <p className="text-xs text-muted-foreground flex items-center justify-center gap-1 font-medium">
-              <TrendingUp className="w-3 h-3" />
-              Conv.
+              {getSourceIcon(topSource)}
+              Top
             </p>
-            <p className="text-2xl font-bold" style={{ color }}>{conversionRate}%</p>
+            <p className="text-lg font-bold" style={{ color }}>{formatSource(topSource)}</p>
           </div>
         </div>
 
