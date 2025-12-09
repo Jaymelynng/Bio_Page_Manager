@@ -24,11 +24,17 @@ const Index = () => {
     }
   };
 
+  // Helper to get stats - handles both object and array formats from Supabase
+  const getStats = (brand: any) => {
+    const stats = Array.isArray(brand.brand_stats) ? brand.brand_stats[0] : brand.brand_stats;
+    return stats || { total_clicks: 0, total_links: 0, conversion_rate: 0 };
+  };
+
   // Calculate aggregate stats from all brands
-  const totalClicks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_clicks || 0), 0) || 0;
-  const totalLinks = brands?.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.total_links || 0), 0) || 0;
+  const totalClicks = brands?.reduce((sum, brand) => sum + (getStats(brand).total_clicks || 0), 0) || 0;
+  const totalLinks = brands?.reduce((sum, brand) => sum + (getStats(brand).total_links || 0), 0) || 0;
   const avgConversionRate = brands && brands.length > 0
-    ? (brands.reduce((sum, brand) => sum + (brand.brand_stats?.[0]?.conversion_rate || 0), 0) / brands.length).toFixed(1)
+    ? (brands.reduce((sum, brand) => sum + (getStats(brand).conversion_rate || 0), 0) / brands.length).toFixed(1)
     : "0.0";
   const activeBrands = brands?.length || 0;
 
@@ -126,19 +132,22 @@ const Index = () => {
           </div>
         ) : brands && brands.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {brands.map((brand: any) => (
-              <BrandCard 
-                key={brand.id} 
-                name={brand.name}
-                handle={brand.handle}
-                color={brand.color || "#b48f8f"}
-                colorSecondary={brand.color_secondary}
-                logoUrl={brand.logo_url}
-                links={brand.brand_stats?.[0]?.total_links || 0}
-                clicks={brand.brand_stats?.[0]?.total_clicks || 0}
-                conversionRate={Number(brand.brand_stats?.[0]?.conversion_rate || 0)}
-              />
-            ))}
+            {brands.map((brand: any) => {
+              const stats = getStats(brand);
+              return (
+                <BrandCard 
+                  key={brand.id} 
+                  name={brand.name}
+                  handle={brand.handle}
+                  color={brand.color || "#b48f8f"}
+                  colorSecondary={brand.color_secondary}
+                  logoUrl={brand.logo_url}
+                  links={stats.total_links || 0}
+                  clicks={stats.total_clicks || 0}
+                  conversionRate={Number(stats.conversion_rate || 0)}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">
