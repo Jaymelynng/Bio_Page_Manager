@@ -126,7 +126,7 @@ export const BrandCard = ({
               background: `linear-gradient(135deg, ${color} 0%, ${secondaryColor} 100%)`,
               boxShadow: `0 4px 15px ${color}40`
             }}
-            onClick={() => navigate(`/${handle}`)}
+            onClick={() => navigate(`/biopage/${handle}`)}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             View
