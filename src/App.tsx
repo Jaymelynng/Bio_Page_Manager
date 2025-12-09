@@ -49,8 +49,8 @@ const App = () => (
           {/* Auth page */}
           <Route path="/auth" element={<AuthPage />} />
           
-          {/* Public gym pages - ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "/:handle" ROUTE */}
-          <Route path="/:handle" element={<BrandBioPage />} />
+          {/* Public gym pages */}
+          <Route path="/linkconnect/:handle" element={<BrandBioPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
