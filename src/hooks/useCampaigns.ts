@@ -72,18 +72,13 @@ export const useDeleteCampaign = () => {
 };
 
 export const generateShareableUrl = (handle: string, source: string, medium: string, campaign: string) => {
-  const baseUrl = window.location.origin;
   const ogFunctionUrl = 'https://qfffsgiopzpwcijdkvcv.supabase.co/functions/v1/og-image';
-  
-  const redirectParams = new URLSearchParams();
-  if (source) redirectParams.set('utm_source', source);
-  if (medium) redirectParams.set('utm_medium', medium);
-  if (campaign) redirectParams.set('utm_campaign', campaign);
-  const redirectQueryString = redirectParams.toString();
-  const redirectUrl = `${baseUrl}/biopage/${handle}${redirectQueryString ? `?${redirectQueryString}` : ''}`;
   
   const ogParams = new URLSearchParams();
   ogParams.set('handle', handle);
-  ogParams.set('redirect', redirectUrl);
+  if (source) ogParams.set('utm_source', source);
+  if (medium) ogParams.set('utm_medium', medium);
+  if (campaign) ogParams.set('utm_campaign', campaign);
+  
   return `${ogFunctionUrl}?${ogParams.toString()}`;
 };
