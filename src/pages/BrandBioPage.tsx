@@ -316,8 +316,15 @@ const BrandBioPage = () => {
               </p>
               <button
                 onClick={() => {
-                  const trialLink = featuredLinks.find((link: any) => link.title.toLowerCase().includes('trial'));
-                  if (trialLink) handleLinkClick(trialLink.id, trialLink.url, trialLink.title);
+                  if (brand.primary_cta_url) {
+                    trackClick.mutate({
+                      brandLinkId: brand.id,
+                      utmSource: utmParams.source,
+                      utmMedium: utmParams.medium,
+                      utmCampaign: utmParams.campaign,
+                    });
+                    window.open(brand.primary_cta_url, "_blank");
+                  }
                 }}
                 className="px-8 py-3 bg-white rounded-xl font-semibold hover:shadow-lg transition-all active:scale-[0.98]"
                 style={{ color: brand.color }}
