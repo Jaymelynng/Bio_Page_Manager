@@ -2,36 +2,22 @@ import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, Link2, LogOut, RefreshCw, LinkIcon, MousePointerClick, Trash2, Settings } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { BarChart3, Users, Link2, LogOut, MousePointerClick, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import biohubHeroFallback from "@/assets/biohub-hero.png";
 
 const Index = () => {
-  const queryClient = useQueryClient();
-  const { data: brands, isLoading, isFetching } = useBrands();
+  const { data: brands, isLoading } = useBrands();
   const brandIds = brands?.map(b => b.id) || [];
   const { data: topSources } = useBrandTopSources(brandIds);
-  const { signOut, user } = useAuth();
+  const { signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isClearing, setIsClearing] = useState(false);
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -49,30 +35,6 @@ const Index = () => {
     fetchHeroImage();
   }, []);
 
-  const handleClearAllStats = async () => {
-    setIsClearing(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('clear-analytics');
-      
-      if (error) throw error;
-      
-      toast({
-        title: 'Stats cleared',
-        description: 'All analytics have been reset to zero.',
-      });
-      
-      queryClient.invalidateQueries({ queryKey: ["brands"] });
-      queryClient.invalidateQueries({ queryKey: ["brand-top-sources"] });
-    } catch (error: any) {
-      toast({
-        title: 'Error clearing stats',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setIsClearing(false);
-    }
-  };
 
   const handleLogout = async () => {
     const { error } = await signOut();
@@ -176,64 +138,8 @@ const Index = () => {
       {/* Brands Grid */}
       <div className="container mx-auto px-4 pb-16 relative z-10">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Your Gyms</h2>
-            <p className="text-muted-foreground">Bio Link Page Manager — create, track all 10 gyms' bio pages from one place</p>
-          </div>
-          <div className="flex gap-2">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="bg-background/80 backdrop-blur-sm hover:bg-destructive/10 border-destructive/50 text-destructive"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Clear Stats
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Clear All Analytics?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will permanently delete all click analytics for all gyms. Stats will be reset to zero. This action cannot be undone.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction 
-                    onClick={handleClearAllStats}
-                    disabled={isClearing}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    {isClearing ? 'Clearing...' : 'Yes, Clear All Stats'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => navigate('/biopage/admin/link-generator')}
-              className="bg-background/80 backdrop-blur-sm hover:bg-background"
-            >
-              <LinkIcon className="h-4 w-4 mr-2" />
-              Link Generator
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => {
-                queryClient.invalidateQueries({ queryKey: ["brands"] });
-                queryClient.invalidateQueries({ queryKey: ["brand-top-sources"] });
-              }}
-              disabled={isFetching}
-              className="bg-background/80 backdrop-blur-sm hover:bg-background"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              {isFetching ? 'Refreshing...' : 'Refresh Stats'}
-            </Button>
-          </div>
+          <h2 className="text-3xl font-bold text-foreground mb-2">Your Gyms</h2>
+          <p className="text-muted-foreground">Bio Link Page Manager — create, track all 10 gyms' bio pages from one place</p>
         </div>
 
         {isLoading ? (
