@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.manage-pins]
 verify_jwt = false
+
+[functions.og-image]
+verify_jwt = false
