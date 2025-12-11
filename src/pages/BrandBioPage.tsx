@@ -285,7 +285,7 @@ const BrandBioPage = () => {
                 className="px-8 py-3 bg-white rounded-xl font-semibold hover:shadow-lg transition-all active:scale-[0.98]"
                 style={{ color: brand.color }}
               >
-                Get Started
+                Request Your Free Trial
               </button>
             </div>
 
