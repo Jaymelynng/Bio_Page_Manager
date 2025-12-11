@@ -53,15 +53,33 @@ Deno.serve(async (req) => {
     if (utmCampaign) redirectParams.append('utm_campaign', utmCampaign);
     const redirectQuery = redirectParams.toString();
     
-    const appUrl = url.searchParams.get('redirect') || 
-      `${baseUrl}/biopage/${handle}${redirectQuery ? `?${redirectQuery}` : ''}`;
+    const appUrl = `${baseUrl}/biopage/${handle}${redirectQuery ? `?${redirectQuery}` : ''}`;
     
+    // Detect if request is from a social media crawler
+    const userAgent = req.headers.get('user-agent') || '';
+    const isCrawler = /facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegram|slackbot|discordbot|bingbot|googlebot/i.test(userAgent);
+    
+    console.log('User-Agent:', userAgent);
+    console.log('Is Crawler:', isCrawler);
+    console.log('Redirect URL:', appUrl);
+
+    // For regular users, do a direct 302 redirect
+    if (!isCrawler) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': appUrl,
+          ...corsHeaders,
+        },
+      });
+    }
+
+    // For crawlers, return HTML with OG tags
     const title = brand.name;
     const description = brand.tagline || `${brand.name} - Classes, schedules, and more in ${brand.city || ''}, ${brand.state || ''}`.trim();
     const imageUrl = brand.logo_url || '';
     const themeColor = brand.color || '#1f53a3';
 
-    // Return HTML with proper OG tags - crawlers will read these, users will be redirected
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,10 +103,6 @@ Deno.serve(async (req) => {
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${imageUrl}">
-  
-  <!-- Redirect for actual users (not crawlers) -->
-  <meta http-equiv="refresh" content="0;url=${appUrl}">
-  <script>window.location.href = "${appUrl}";</script>
 </head>
 <body>
   <p>Redirecting to <a href="${appUrl}">${title}</a>...</p>
