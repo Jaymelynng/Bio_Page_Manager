@@ -17,13 +17,15 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import biohubHeroFallback from "@/assets/biohub-hero.png";
 
 const Index = () => {
-  const { data: brands, isLoading, refetch, isFetching } = useBrands();
+  const queryClient = useQueryClient();
+  const { data: brands, isLoading, isFetching } = useBrands();
   const brandIds = brands?.map(b => b.id) || [];
   const { data: topSources } = useBrandTopSources(brandIds);
   const { signOut, user } = useAuth();
@@ -59,7 +61,8 @@ const Index = () => {
         description: 'All analytics have been reset to zero.',
       });
       
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brand-top-sources"] });
     } catch (error: any) {
       toast({
         title: 'Error clearing stats',
@@ -220,7 +223,10 @@ const Index = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => refetch()}
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ["brands"] });
+                queryClient.invalidateQueries({ queryKey: ["brand-top-sources"] });
+              }}
               disabled={isFetching}
               className="bg-background/80 backdrop-blur-sm hover:bg-background"
             >
