@@ -21,15 +21,52 @@ const BrandBioPage = () => {
     campaign: searchParams.get('utm_campaign'),
   }), [searchParams]);
 
-  // Set dynamic page title for individual gym pages
+  // Set dynamic page title and OG meta tags for link previews
   useEffect(() => {
     if (brand?.name) {
       document.title = `${brand.name} | BioHub`;
+      
+      // Update OG meta tags for social media previews
+      const updateMetaTag = (property: string, content: string) => {
+        let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('property', property);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+      
+      const updateNameMetaTag = (name: string, content: string) => {
+        let meta = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement;
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('name', name);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      };
+      
+      const description = brand.tagline || `${brand.name} - Classes, schedules, and more.`;
+      const imageUrl = brand.logo_url || '';
+      
+      // Open Graph tags
+      updateMetaTag('og:title', brand.name);
+      updateMetaTag('og:description', description);
+      updateMetaTag('og:image', imageUrl);
+      updateMetaTag('og:type', 'website');
+      
+      // Twitter tags
+      updateNameMetaTag('twitter:card', 'summary');
+      updateNameMetaTag('twitter:title', brand.name);
+      updateNameMetaTag('twitter:description', description);
+      updateNameMetaTag('twitter:image', imageUrl);
     }
+    
     return () => {
       document.title = 'BioHub - Gym Bio Links';
     };
-  }, [brand?.name]);
+  }, [brand?.name, brand?.logo_url, brand?.tagline]);
 
   // Secret combo: Shift + * (8)
   useEffect(() => {
