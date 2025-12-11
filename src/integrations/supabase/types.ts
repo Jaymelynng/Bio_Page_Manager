@@ -291,6 +291,39 @@ export type Database = {
         }
         Relationships: []
       }
+      campaigns: {
+        Row: {
+          campaign: string
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          medium: string
+          name: string
+          source: string
+        }
+        Insert: {
+          campaign: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          medium: string
+          name: string
+          source: string
+        }
+        Update: {
+          campaign?: string
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          medium?: string
+          name?: string
+          source?: string
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           actions: Json | null

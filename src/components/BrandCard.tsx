@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Eye, MousePointerClick, ExternalLink, Pencil, Instagram, Facebook, Mail, MessageCircle, Globe, Copy } from "lucide-react";
+import { BarChart3, Eye, MousePointerClick, ExternalLink, Pencil, Instagram, Facebook, Mail, MessageCircle, Globe, Copy, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useCampaigns, generateShareableUrl } from "@/hooks/useCampaigns";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BrandCardProps {
   name: string;
@@ -26,16 +29,26 @@ export const BrandCard = ({
   logoUrl
 }: BrandCardProps) => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const secondaryColor = colorSecondary || color;
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const { data: campaigns } = useCampaigns();
 
-  const copyToClipboard = async () => {
-    const url = `${window.location.origin}/biopage/${handle}`;
+  const getIconComponent = (iconName: string | null) => {
+    switch(iconName) {
+      case 'instagram': return Instagram;
+      case 'facebook': return Facebook;
+      case 'mail': return Mail;
+      case 'message-circle': return MessageCircle;
+      default: return Globe;
+    }
+  };
+
+  const copyShareableLink = async (campaignId: string, source: string, medium: string, campaign: string, campaignName: string) => {
+    const url = generateShareableUrl(handle, source, medium, campaign);
     await navigator.clipboard.writeText(url);
-    toast({
-      title: "Link copied!",
-      description: `Bio page URL for ${name} copied to clipboard.`,
-    });
+    setCopiedId(campaignId);
+    toast.success(`${campaignName} link copied!`);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const getSourceIcon = (source: string | null | undefined) => {
@@ -74,7 +87,7 @@ export const BrandCard = ({
       />
       
       <div className="p-6 relative">
-        <div className="flex items-start justify-between mb-6">
+        <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="text-xl font-bold text-foreground mb-1 group-hover:text-foreground transition-colors duration-300">{name}</h3>
             <p className="text-sm text-muted-foreground font-medium">@{handle}</p>
@@ -99,9 +112,43 @@ export const BrandCard = ({
           </div>
         </div>
 
+        {/* Quick Share Links */}
+        {campaigns && campaigns.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs text-muted-foreground mb-2 font-medium">Quick Share:</p>
+            <div className="flex flex-wrap gap-1.5">
+              <TooltipProvider delayDuration={200}>
+                {campaigns.map((campaign) => {
+                  const Icon = getIconComponent(campaign.icon);
+                  const isCopied = copiedId === campaign.id;
+                  return (
+                    <Tooltip key={campaign.id}>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={() => copyShareableLink(campaign.id, campaign.source, campaign.medium, campaign.campaign, campaign.name)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
+                          style={{ 
+                            backgroundColor: isCopied ? '#22c55e' : `${color}15`,
+                            color: isCopied ? 'white' : color
+                          }}
+                        >
+                          {isCopied ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs">
+                        Copy {campaign.name} link
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </TooltipProvider>
+            </div>
+          </div>
+        )}
+
         {/* Stats section with brand color accent */}
         <div 
-          className="grid grid-cols-3 gap-4 mb-6 p-4 rounded-xl"
+          className="grid grid-cols-3 gap-4 mb-4 p-4 rounded-xl"
           style={{ backgroundColor: `${color}08` }}
         >
           <div className="space-y-1 text-center">
@@ -151,18 +198,6 @@ export const BrandCard = ({
           >
             <BarChart3 className="w-4 h-4 mr-1" />
             Stats
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 min-w-[70px] rounded-xl border-2 transition-all duration-300"
-            style={{ 
-              borderColor: `${color}30`,
-            }}
-            onClick={copyToClipboard}
-          >
-            <Copy className="w-4 h-4 mr-1" />
-            Copy
           </Button>
           <Button 
             size="sm" 
