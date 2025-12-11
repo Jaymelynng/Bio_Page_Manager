@@ -38,14 +38,22 @@ const AdminLinkGenerator = () => {
   });
 
   const baseUrl = window.location.origin;
+  const ogFunctionUrl = 'https://qfffsgiopzpwcijdkvcv.supabase.co/functions/v1/og-image';
 
+  // Generate OG-friendly URL that shows gym branding in link previews
   const generateUrl = (handle: string, source: string, medium: string, campaign: string) => {
-    const params = new URLSearchParams();
-    if (source) params.set('utm_source', source);
-    if (medium) params.set('utm_medium', medium);
-    if (campaign) params.set('utm_campaign', campaign);
-    const queryString = params.toString();
-    return `${baseUrl}/biopage/${handle}${queryString ? `?${queryString}` : ''}`;
+    const redirectParams = new URLSearchParams();
+    if (source) redirectParams.set('utm_source', source);
+    if (medium) redirectParams.set('utm_medium', medium);
+    if (campaign) redirectParams.set('utm_campaign', campaign);
+    const redirectQueryString = redirectParams.toString();
+    const redirectUrl = `${baseUrl}/biopage/${handle}${redirectQueryString ? `?${redirectQueryString}` : ''}`;
+    
+    // Use edge function URL for proper OG tags, with redirect to actual page
+    const ogParams = new URLSearchParams();
+    ogParams.set('handle', handle);
+    ogParams.set('redirect', redirectUrl);
+    return `${ogFunctionUrl}?${ogParams.toString()}`;
   };
 
   const copyToClipboard = async (text: string, id: string) => {
