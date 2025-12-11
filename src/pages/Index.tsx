@@ -150,7 +150,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Your Gyms</h2>
-            <p className="text-muted-foreground">All {activeBrands} gym bio link pages</p>
+            <p className="text-muted-foreground">Bio Link Page Manager — create, track all 10 gyms' bio pages from one place</p>
           </div>
           <div className="flex gap-2">
             <AlertDialog>
