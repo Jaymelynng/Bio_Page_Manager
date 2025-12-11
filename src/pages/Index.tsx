@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
-import { useAuth } from "@/hooks/useAuth";
+import { usePinAuth } from "@/hooks/usePinAuth";
 import { useToast } from "@/hooks/use-toast";
 import biohubHeroFallback from "@/assets/biohub-hero.png";
 
@@ -15,7 +15,7 @@ const Index = () => {
   const { data: brands, isLoading } = useBrands();
   const brandIds = brands?.map(b => b.id) || [];
   const { data: topSources } = useBrandTopSources(brandIds);
-  const { signOut } = useAuth();
+  const { signOut } = usePinAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
@@ -36,15 +36,9 @@ const Index = () => {
   }, []);
 
 
-  const handleLogout = async () => {
-    const { error } = await signOut();
-    if (error) {
-      toast({
-        title: 'Error signing out',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
+  const handleLogout = () => {
+    signOut();
+    navigate('/biopage/auth');
   };
 
   // Helper to get stats - handles both object and array formats from Supabase

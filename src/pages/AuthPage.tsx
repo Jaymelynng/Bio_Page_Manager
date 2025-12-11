@@ -1,78 +1,49 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { usePinAuth } from '@/hooks/usePinAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Lock } from 'lucide-react';
 import biohubHero from '@/assets/biohub-hero.png';
 
 export default function AuthPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(true);
+  const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  const { signIn, signUp, user, isAdmin, loading } = useAuth();
-  
-  // Load remembered email on mount
-  useEffect(() => {
-    const rememberedEmail = localStorage.getItem('biohub_remembered_email');
-    if (rememberedEmail) {
-      setEmail(rememberedEmail);
-    }
-  }, []);
+  const { verifyPin, isAuthenticated, loading } = usePinAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Redirect if already logged in and is admin
+  // Redirect if already logged in
   useEffect(() => {
-    if (!loading && user && isAdmin) {
+    if (!loading && isAuthenticated) {
       navigate('/biopage');
     }
-  }, [user, isAdmin, loading, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await signUp(email, password);
-        if (error) {
-          if (error.message.includes('already registered')) {
-            toast({
-              title: 'Account exists',
-              description: 'This email is already registered. Please sign in instead.',
-              variant: 'destructive',
-            });
-          } else {
-            toast({
-              title: 'Sign up failed',
-              description: error.message,
-              variant: 'destructive',
-            });
-          }
-        } else {
-          toast({
-            title: 'Account created!',
-            description: 'Please contact the admin to grant you access.',
-          });
-        }
+      const { success, error } = await verifyPin(pin);
+      
+      if (success) {
+        toast({
+          title: 'Welcome!',
+          description: 'You have been signed in successfully.',
+        });
+        navigate('/biopage');
       } else {
-        const { error } = await signIn(email, password, rememberMe);
-        if (error) {
-          toast({
-            title: 'Sign in failed',
-            description: error.message,
-            variant: 'destructive',
-          });
-        }
+        toast({
+          title: 'Invalid PIN',
+          description: error || 'Please check your PIN and try again.',
+          variant: 'destructive',
+        });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'An unexpected error occurred.',
@@ -103,78 +74,46 @@ export default function AuthPage() {
             />
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
+            Welcome to BioHub
           </CardTitle>
           <CardDescription className="text-muted-foreground">
-            {isSignUp 
-              ? 'Sign up to request admin access' 
-              : 'Sign in to access the BioHub dashboard'}
+            Enter your PIN to access the dashboard
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="pin" className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                PIN Code
+              </Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
+                id="pin"
                 type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="Enter your PIN"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                 required
-                minLength={6}
-                className="h-12"
+                minLength={4}
+                maxLength={6}
+                className="h-14 text-center text-2xl tracking-widest font-mono"
+                autoComplete="off"
               />
             </div>
-            {!isSignUp && (
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="remember" 
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                />
-                <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">
-                  Remember me
-                </Label>
-              </div>
-            )}
             <Button
               type="submit"
               className="w-full h-12 text-lg font-semibold"
-              disabled={isLoading}
+              disabled={isLoading || pin.length < 4}
             >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
-              ) : isSignUp ? (
-                'Create Account'
               ) : (
                 'Sign In'
               )}
             </Button>
           </form>
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isSignUp
-                ? 'Already have an account? Sign in'
-                : "Need an account? Sign up"}
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>
