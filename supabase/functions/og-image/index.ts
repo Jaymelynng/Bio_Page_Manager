@@ -41,8 +41,20 @@ Deno.serve(async (req) => {
 
     console.log('Brand found:', brand.name);
 
-    // Build the redirect URL to the actual page
-    const appUrl = url.searchParams.get('redirect') || `https://biopages.mygymtools.com/biopage/${handle}`;
+    // Build the redirect URL to the actual page with UTM params
+    const baseUrl = 'https://biopages.mygymtools.com';
+    const utmSource = url.searchParams.get('utm_source');
+    const utmMedium = url.searchParams.get('utm_medium');
+    const utmCampaign = url.searchParams.get('utm_campaign');
+    
+    const redirectParams = new URLSearchParams();
+    if (utmSource) redirectParams.append('utm_source', utmSource);
+    if (utmMedium) redirectParams.append('utm_medium', utmMedium);
+    if (utmCampaign) redirectParams.append('utm_campaign', utmCampaign);
+    const redirectQuery = redirectParams.toString();
+    
+    const appUrl = url.searchParams.get('redirect') || 
+      `${baseUrl}/biopage/${handle}${redirectQuery ? `?${redirectQuery}` : ''}`;
     
     const title = brand.name;
     const description = brand.tagline || `${brand.name} - Classes, schedules, and more in ${brand.city || ''}, ${brand.state || ''}`.trim();
