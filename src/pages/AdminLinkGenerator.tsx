@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Copy, Check, Link2, Instagram, Facebook, Mail, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ const PRESET_CHANNELS = [
 
 const AdminLinkGenerator = () => {
   const navigate = useNavigate();
-  const [selectedGym, setSelectedGym] = useState<string>("");
+  const [selectedGyms, setSelectedGyms] = useState<string[]>([]);
   const [customSource, setCustomSource] = useState("");
   const [customMedium, setCustomMedium] = useState("");
   const [customCampaign, setCustomCampaign] = useState("");
@@ -55,7 +55,34 @@ const AdminLinkGenerator = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const selectedBrand = brands?.find(b => b.id === selectedGym);
+  const copyAllLinks = async (channel: typeof PRESET_CHANNELS[0]) => {
+    const links = selectedBrands.map(brand => 
+      `${brand.name}: ${generateUrl(brand.handle, channel.source, channel.medium, channel.campaign)}`
+    ).join('\n\n');
+    await navigator.clipboard.writeText(links);
+    setCopiedId(`all-${channel.id}`);
+    toast.success(`All ${channel.label} links copied!`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked && brands) {
+      setSelectedGyms(brands.map(b => b.id));
+    } else {
+      setSelectedGyms([]);
+    }
+  };
+
+  const handleGymToggle = (gymId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedGyms(prev => [...prev, gymId]);
+    } else {
+      setSelectedGyms(prev => prev.filter(id => id !== gymId));
+    }
+  };
+
+  const selectedBrands = brands?.filter(b => selectedGyms.includes(b.id)) || [];
+  const allSelected = brands && brands.length > 0 && selectedGyms.length === brands.length;
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -76,24 +103,49 @@ const AdminLinkGenerator = () => {
           </div>
         </div>
 
-        {/* Gym Selector */}
+        {/* Gym Selector with Checkboxes */}
         <Card className="p-6 mb-6">
-          <Label className="text-base font-semibold mb-3 block">Select Gym</Label>
-          <Select value={selectedGym} onValueChange={setSelectedGym}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Choose a gym..." />
-            </SelectTrigger>
-            <SelectContent>
-              {brands?.map((brand) => (
-                <SelectItem key={brand.id} value={brand.id}>
+          <Label className="text-base font-semibold mb-4 block">Select Gyms</Label>
+          
+          {/* Select All */}
+          <div className="flex items-center gap-3 pb-3 mb-3 border-b border-border">
+            <Checkbox 
+              id="select-all"
+              checked={allSelected}
+              onCheckedChange={handleSelectAll}
+            />
+            <label 
+              htmlFor="select-all" 
+              className="text-sm font-medium cursor-pointer"
+            >
+              Select All Gyms
+            </label>
+            <span className="text-xs text-muted-foreground ml-auto">
+              {selectedGyms.length} of {brands?.length || 0} selected
+            </span>
+          </div>
+
+          {/* Individual Gyms */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {brands?.map((brand) => (
+              <div key={brand.id} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50">
+                <Checkbox 
+                  id={brand.id}
+                  checked={selectedGyms.includes(brand.id)}
+                  onCheckedChange={(checked) => handleGymToggle(brand.id, checked as boolean)}
+                />
+                <label 
+                  htmlFor={brand.id} 
+                  className="text-sm cursor-pointer flex-1"
+                >
                   {brand.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </label>
+              </div>
+            ))}
+          </div>
         </Card>
 
-        {selectedBrand && (
+        {selectedBrands.length > 0 && (
           <>
             {/* Preset Channel Links */}
             <Card className="p-6 mb-6">
@@ -101,38 +153,62 @@ const AdminLinkGenerator = () => {
                 <Link2 className="w-5 h-5 text-primary" />
                 Quick Links by Channel
               </h2>
-              <div className="space-y-3">
-                {PRESET_CHANNELS.map((channel) => {
-                  const url = generateUrl(selectedBrand.handle, channel.source, channel.medium, channel.campaign);
-                  const Icon = channel.icon;
-                  return (
-                    <div 
-                      key={channel.id}
-                      className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium">{channel.label}</p>
-                        <p className="text-sm text-muted-foreground truncate">{url}</p>
+              
+              {PRESET_CHANNELS.map((channel) => {
+                const Icon = channel.icon;
+                return (
+                  <div key={channel.id} className="mb-6 last:mb-0">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-primary" />
+                        </div>
+                        <span className="font-medium">{channel.label}</span>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard(url, channel.id)}
-                        className="flex-shrink-0"
+                        onClick={() => copyAllLinks(channel)}
                       >
-                        {copiedId === channel.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
+                        {copiedId === `all-${channel.id}` ? (
+                          <><Check className="h-4 w-4 text-green-500 mr-1" /> Copied!</>
                         ) : (
-                          <Copy className="h-4 w-4" />
+                          <><Copy className="h-4 w-4 mr-1" /> Copy All</>
                         )}
                       </Button>
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="space-y-2">
+                      {selectedBrands.map((brand) => {
+                        const url = generateUrl(brand.handle, channel.source, channel.medium, channel.campaign);
+                        const copyId = `${channel.id}-${brand.id}`;
+                        return (
+                          <div 
+                            key={brand.id}
+                            className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">{brand.name}</p>
+                              <p className="text-xs text-muted-foreground truncate">{url}</p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyToClipboard(url, copyId)}
+                              className="flex-shrink-0"
+                            >
+                              {copiedId === copyId ? (
+                                <Check className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
             </Card>
 
             {/* Custom Link Generator */}
@@ -169,26 +245,33 @@ const AdminLinkGenerator = () => {
               </div>
               
               {(customSource || customMedium || customCampaign) && (
-                <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-muted-foreground truncate">
-                      {generateUrl(selectedBrand.handle, customSource, customMedium, customCampaign)}
-                    </p>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(
-                      generateUrl(selectedBrand.handle, customSource, customMedium, customCampaign),
-                      'custom'
-                    )}
-                  >
-                    {copiedId === 'custom' ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
+                <div className="space-y-2">
+                  {selectedBrands.map((brand) => {
+                    const url = generateUrl(brand.handle, customSource, customMedium, customCampaign);
+                    const copyId = `custom-${brand.id}`;
+                    return (
+                      <div 
+                        key={brand.id}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium">{brand.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{url}</p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(url, copyId)}
+                        >
+                          {copiedId === copyId ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </Card>
