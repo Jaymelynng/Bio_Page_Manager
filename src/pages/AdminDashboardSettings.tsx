@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, Image, Loader2, RefreshCw, LinkIcon, Trash2 } from "lucide-react";
+import { ArrowLeft, Upload, Image, Loader2, RefreshCw, LinkIcon, Trash2, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -216,6 +216,16 @@ const AdminDashboardSettings = () => {
               <LinkIcon className="h-4 w-4 mr-3" />
               Link Generator
               <span className="ml-auto text-xs text-muted-foreground">Create UTM-tagged URLs</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => navigate('/biopage/admin/pin-management')}
+              className="w-full justify-start h-12"
+            >
+              <Key className="h-4 w-4 mr-3" />
+              PIN Management
+              <span className="ml-auto text-xs text-muted-foreground">View & reset user PINs</span>
             </Button>
 
             <AlertDialog>

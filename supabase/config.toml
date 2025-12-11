@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.update-app-setting]
 verify_jwt = false
+
+[functions.manage-pins]
+verify_jwt = false
