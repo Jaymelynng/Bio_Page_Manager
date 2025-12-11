@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Eye, MousePointerClick, ExternalLink, Pencil, Instagram, Facebook, Mail, MessageCircle, Globe } from "lucide-react";
+import { BarChart3, Eye, MousePointerClick, ExternalLink, Pencil, Instagram, Facebook, Mail, MessageCircle, Globe, Copy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface BrandCardProps {
   name: string;
@@ -25,7 +26,17 @@ export const BrandCard = ({
   logoUrl
 }: BrandCardProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const secondaryColor = colorSecondary || color;
+
+  const copyToClipboard = async () => {
+    const url = `${window.location.origin}/biopage/${handle}`;
+    await navigator.clipboard.writeText(url);
+    toast({
+      title: "Link copied!",
+      description: `Bio page URL for ${name} copied to clipboard.`,
+    });
+  };
 
   const getSourceIcon = (source: string | null | undefined) => {
     if (!source) return <Globe className="w-4 h-4" />;
@@ -132,7 +143,7 @@ export const BrandCard = ({
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 min-w-[90px] rounded-xl border-2 transition-all duration-300"
+            className="flex-1 min-w-[70px] rounded-xl border-2 transition-all duration-300"
             style={{ 
               borderColor: `${color}30`,
             }}
@@ -140,6 +151,18 @@ export const BrandCard = ({
           >
             <BarChart3 className="w-4 h-4 mr-1" />
             Stats
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 min-w-[70px] rounded-xl border-2 transition-all duration-300"
+            style={{ 
+              borderColor: `${color}30`,
+            }}
+            onClick={copyToClipboard}
+          >
+            <Copy className="w-4 h-4 mr-1" />
+            Copy
           </Button>
           <Button 
             size="sm" 
