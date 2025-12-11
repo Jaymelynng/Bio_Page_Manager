@@ -10,6 +10,7 @@ import AdminVideoUpload from "./pages/AdminVideoUpload";
 import AdminEditGym from "./pages/AdminEditGym";
 import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminLinkGenerator from "./pages/AdminLinkGenerator";
+import AdminDashboardSettings from "./pages/AdminDashboardSettings";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -63,6 +64,14 @@ const App = () => (
             element={
               <ProtectedRoute requireAdmin>
                 <AdminLinkGenerator />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/biopage/admin/dashboard-settings" 
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDashboardSettings />
               </ProtectedRoute>
             } 
           />

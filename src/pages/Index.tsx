@@ -2,7 +2,7 @@ import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, Link2, LogOut, RefreshCw, LinkIcon, MousePointerClick, Trash2 } from "lucide-react";
+import { BarChart3, Users, Link2, LogOut, RefreshCw, LinkIcon, MousePointerClick, Trash2, Settings } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,12 +15,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import biohubHero from "@/assets/biohub-hero.png";
+import biohubHeroFallback from "@/assets/biohub-hero.png";
 
 const Index = () => {
   const { data: brands, isLoading, refetch, isFetching } = useBrands();
@@ -30,6 +30,22 @@ const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isClearing, setIsClearing] = useState(false);
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchHeroImage = async () => {
+      const { data } = await supabase
+        .from('app_settings')
+        .select('value')
+        .eq('key', 'dashboard_hero_image')
+        .single();
+      
+      if (data?.value) {
+        setHeroImageUrl(data.value);
+      }
+    };
+    fetchHeroImage();
+  }, []);
 
   const handleClearAllStats = async () => {
     setIsClearing(true);
@@ -80,8 +96,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#d6c5bf] via-[#e6e6e6] to-[#c3a5a5]">
-      {/* Header with Logout */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Header with Settings and Logout */}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => navigate('/biopage/admin/dashboard-settings')}
+          className="bg-background/80 backdrop-blur-sm hover:bg-background"
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Settings
+        </Button>
         <Button 
           variant="outline" 
           size="sm" 
@@ -94,11 +119,11 @@ const Index = () => {
       </div>
 
       {/* Hero Section - Full GIF Background */}
-      <div className="relative overflow-hidden h-[280px] md:h-[350px]">
+      <div className="relative w-full bg-gradient-to-b from-[#d6c5bf] to-[#e6e6e6]">
         <img 
-          src={biohubHero} 
+          src={heroImageUrl || biohubHeroFallback} 
           alt="BioHub - Gym Bio Link Manager"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          className="w-full h-auto max-h-[400px] object-contain pointer-events-none"
         />
       </div>
 
