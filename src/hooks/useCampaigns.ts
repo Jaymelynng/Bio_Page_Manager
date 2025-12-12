@@ -72,12 +72,8 @@ export const useDeleteCampaign = () => {
   });
 };
 
-export const generateShareableUrl = (brandShortCode: string, campaignShortCode: string) => {
-  const redirectFunctionUrl = 'https://qfffsgiopzpwcijdkvcv.supabase.co/functions/v1/redirect';
-  return `${redirectFunctionUrl}/${brandShortCode}-${campaignShortCode}`;
-};
+const PRODUCTION_DOMAIN = 'https://biopages.mygymtools.com';
 
-export const generateCleanUrl = (brandShortCode: string, campaignShortCode: string) => {
-  // Clean production URL for display/sharing
-  return `biopages.mygymtools.com/go/${brandShortCode}-${campaignShortCode}`;
+export const generateShareableUrl = (brandShortCode: string, campaignShortCode: string) => {
+  return `${PRODUCTION_DOMAIN}/go/${brandShortCode}-${campaignShortCode}`;
 };
