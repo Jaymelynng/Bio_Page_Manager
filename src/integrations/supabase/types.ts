@@ -226,6 +226,7 @@ export type Database = {
           primary_cta_url: string | null
           rating: number | null
           rating_count: number | null
+          short_code: string | null
           state: string | null
           tagline: string | null
           updated_at: string
@@ -255,6 +256,7 @@ export type Database = {
           primary_cta_url?: string | null
           rating?: number | null
           rating_count?: number | null
+          short_code?: string | null
           state?: string | null
           tagline?: string | null
           updated_at?: string
@@ -284,6 +286,7 @@ export type Database = {
           primary_cta_url?: string | null
           rating?: number | null
           rating_count?: number | null
+          short_code?: string | null
           state?: string | null
           tagline?: string | null
           updated_at?: string
@@ -300,6 +303,7 @@ export type Database = {
           is_active: boolean | null
           medium: string
           name: string
+          short_code: string | null
           source: string
         }
         Insert: {
@@ -310,6 +314,7 @@ export type Database = {
           is_active?: boolean | null
           medium: string
           name: string
+          short_code?: string | null
           source: string
         }
         Update: {
@@ -320,6 +325,7 @@ export type Database = {
           is_active?: boolean | null
           medium?: string
           name?: string
+          short_code?: string | null
           source?: string
         }
         Relationships: []

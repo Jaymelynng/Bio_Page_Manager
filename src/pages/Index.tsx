@@ -151,6 +151,7 @@ const Index = () => {
                   key={brand.id} 
                   name={brand.name}
                   handle={brand.handle}
+                  shortCode={brand.short_code}
                   color={brand.color || "#b48f8f"}
                   colorSecondary={brand.color_secondary}
                   logoUrl={brand.logo_url}

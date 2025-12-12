@@ -11,6 +11,7 @@ export interface Campaign {
   icon: string | null;
   is_active: boolean;
   created_at: string;
+  short_code: string | null;
 }
 
 export const useCampaigns = () => {
@@ -71,14 +72,12 @@ export const useDeleteCampaign = () => {
   });
 };
 
-export const generateShareableUrl = (handle: string, source: string, medium: string, campaign: string) => {
-  const ogFunctionUrl = 'https://qfffsgiopzpwcijdkvcv.supabase.co/functions/v1/og-image';
-  
-  const ogParams = new URLSearchParams();
-  ogParams.set('handle', handle);
-  if (source) ogParams.set('utm_source', source);
-  if (medium) ogParams.set('utm_medium', medium);
-  if (campaign) ogParams.set('utm_campaign', campaign);
-  
-  return `${ogFunctionUrl}?${ogParams.toString()}`;
+export const generateShareableUrl = (brandShortCode: string, campaignShortCode: string) => {
+  const redirectFunctionUrl = 'https://qfffsgiopzpwcijdkvcv.supabase.co/functions/v1/redirect';
+  return `${redirectFunctionUrl}/${brandShortCode}-${campaignShortCode}`;
+};
+
+export const generateCleanUrl = (brandShortCode: string, campaignShortCode: string) => {
+  // Clean production URL for display/sharing
+  return `biopages.mygymtools.com/go/${brandShortCode}-${campaignShortCode}`;
 };
