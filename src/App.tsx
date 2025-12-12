@@ -14,6 +14,7 @@ import AdminDashboardSettings from "./pages/AdminDashboardSettings";
 import AdminPinManagement from "./pages/AdminPinManagement";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 
 const queryClient = new QueryClient();
 
@@ -88,8 +89,12 @@ const App = () => (
           {/* Auth page */}
           <Route path="/biopage/auth" element={<AuthPage />} />
           
+          {/* Short link redirect */}
+          <Route path="/go/:shortCode" element={<ShortLinkRedirect />} />
+          
           {/* Public gym pages */}
           <Route path="/biopage/:handle" element={<BrandBioPage />} />
+          <Route path="*" element={<NotFound />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
