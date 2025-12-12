@@ -42,6 +42,7 @@ const AdminLinkGenerator = () => {
     medium: '',
     campaign: '',
     icon: 'globe',
+    short_code: '',
   });
   const [expandedCampaign, setExpandedCampaign] = useState<string | null>(null);
 
@@ -54,7 +55,7 @@ const AdminLinkGenerator = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('brands')
-        .select('id, name, handle')
+        .select('id, name, handle, short_code')
         .order('name');
       if (error) throw error;
       return data;
@@ -73,13 +74,15 @@ const AdminLinkGenerator = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const copyAllLinks = async (campaignId: string, source: string, medium: string, campaignName: string) => {
-    if (!brands) return;
-    const links = brands.map(brand => 
-      `${brand.name}: ${generateShareableUrl(brand.handle, source, medium, campaignName)}`
-    ).join('\n\n');
+  const copyAllLinks = async (campaign: typeof campaigns extends (infer T)[] | undefined ? T : never) => {
+    if (!brands || !campaign.short_code) return;
+    const links = brands
+      .filter(brand => brand.short_code)
+      .map(brand => 
+        `${brand.name}: ${generateShareableUrl(brand.short_code!, campaign.short_code!)}`
+      ).join('\n\n');
     await navigator.clipboard.writeText(links);
-    setCopiedId(`all-${campaignId}`);
+    setCopiedId(`all-${campaign.id}`);
     toast.success("All links copied!");
     setTimeout(() => setCopiedId(null), 2000);
   };
@@ -90,7 +93,7 @@ const AdminLinkGenerator = () => {
       return;
     }
     await createCampaign.mutateAsync(newCampaign);
-    setNewCampaign({ name: '', source: '', medium: '', campaign: '', icon: 'globe' });
+    setNewCampaign({ name: '', source: '', medium: '', campaign: '', icon: 'globe', short_code: '' });
     setIsAddOpen(false);
   };
 
@@ -158,7 +161,7 @@ const AdminLinkGenerator = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>Source</Label>
                     <Input 
@@ -167,6 +170,17 @@ const AdminLinkGenerator = () => {
                       onChange={(e) => setNewCampaign(prev => ({ ...prev, source: e.target.value }))}
                     />
                   </div>
+                  <div>
+                    <Label>Short Code</Label>
+                    <Input 
+                      placeholder="ig"
+                      value={newCampaign.short_code}
+                      onChange={(e) => setNewCampaign(prev => ({ ...prev, short_code: e.target.value.toLowerCase() }))}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">Used in short URLs</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label>Medium</Label>
                     <Input 
@@ -232,7 +246,7 @@ const AdminLinkGenerator = () => {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          copyAllLinks(campaign.id, campaign.source, campaign.medium, campaign.campaign);
+                          copyAllLinks(campaign);
                         }}
                       >
                         {copiedId === `all-${campaign.id}` ? (
@@ -258,8 +272,10 @@ const AdminLinkGenerator = () => {
                   
                   {isExpanded && brands && (
                     <div className="border-t border-border bg-muted/30 p-4 space-y-2">
-                      {brands.map((brand) => {
-                        const url = generateShareableUrl(brand.handle, campaign.source, campaign.medium, campaign.campaign);
+                      {brands.filter(b => b.short_code).map((brand) => {
+                        const url = brand.short_code && campaign.short_code 
+                          ? generateShareableUrl(brand.short_code, campaign.short_code)
+                          : `Missing short code`;
                         const copyId = `${campaign.id}-${brand.id}`;
                         return (
                           <div 

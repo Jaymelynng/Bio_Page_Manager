@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface BrandCardProps {
   name: string;
   handle: string;
+  shortCode?: string;
   color: string;
   colorSecondary?: string;
   links: number;
@@ -21,6 +22,7 @@ interface BrandCardProps {
 export const BrandCard = ({ 
   name, 
   handle, 
+  shortCode,
   color, 
   colorSecondary,
   links, 
@@ -43,8 +45,12 @@ export const BrandCard = ({
     }
   };
 
-  const copyShareableLink = async (campaignId: string, source: string, medium: string, campaign: string, campaignName: string) => {
-    const url = generateShareableUrl(handle, source, medium, campaign);
+  const copyShareableLink = async (campaignId: string, campaignShortCode: string | null, campaignName: string) => {
+    if (!shortCode || !campaignShortCode) {
+      toast.error("Short codes not configured");
+      return;
+    }
+    const url = generateShareableUrl(shortCode, campaignShortCode);
     await navigator.clipboard.writeText(url);
     setCopiedId(campaignId);
     toast.success(`${campaignName} link copied!`);
@@ -125,7 +131,7 @@ export const BrandCard = ({
                     <Tooltip key={campaign.id}>
                       <TooltipTrigger asChild>
                         <button
-                          onClick={() => copyShareableLink(campaign.id, campaign.source, campaign.medium, campaign.campaign, campaign.name)}
+                          onClick={() => copyShareableLink(campaign.id, campaign.short_code, campaign.name)}
                           className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-110"
                           style={{ 
                             backgroundColor: isCopied ? '#22c55e' : `${color}15`,
