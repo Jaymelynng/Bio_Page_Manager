@@ -12,6 +12,7 @@ import AdminAnalytics from "./pages/AdminAnalytics";
 import AdminLinkGenerator from "./pages/AdminLinkGenerator";
 import AdminDashboardSettings from "./pages/AdminDashboardSettings";
 import AdminPinManagement from "./pages/AdminPinManagement";
+import AdminDocumentation from "./pages/AdminDocumentation";
 import AuthPage from "./pages/AuthPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
@@ -82,6 +83,14 @@ const App = () => (
             element={
               <ProtectedRoute requireAdmin>
                 <AdminPinManagement />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/biopage/admin/documentation" 
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDocumentation />
               </ProtectedRoute>
             } 
           />
