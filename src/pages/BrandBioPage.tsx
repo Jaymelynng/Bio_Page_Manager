@@ -29,6 +29,38 @@ const BrandBioPage = () => {
     showCategories: true,
   }, [template]);
 
+  // Section config with defaults
+  interface SectionConfig {
+    id: string;
+    name: string;
+    visible: boolean;
+    order: number;
+  }
+  
+  const defaultSections: SectionConfig[] = [
+    { id: 'hero', name: 'Hero Banner', visible: true, order: 1 },
+    { id: 'cta', name: 'Call to Action', visible: true, order: 2 },
+    { id: 'quickActions', name: 'Quick Actions', visible: true, order: 3 },
+    { id: 'links', name: 'Links by Category', visible: true, order: 4 },
+    { id: 'social', name: 'Social Media', visible: true, order: 5 },
+    { id: 'footer', name: 'Contact & Footer', visible: true, order: 6 },
+  ];
+  
+  const sectionConfig = useMemo(() => {
+    const config = brand?.section_config as unknown as { sections: SectionConfig[] } | null;
+    return config?.sections || defaultSections;
+  }, [brand?.section_config]);
+  
+  const isSectionVisible = (sectionId: string) => {
+    const section = sectionConfig.find(s => s.id === sectionId);
+    return section?.visible ?? true;
+  };
+  
+  const getSectionOrder = (sectionId: string) => {
+    const section = sectionConfig.find(s => s.id === sectionId);
+    return section?.order ?? 99;
+  };
+
   // Capture UTM parameters from URL
   const utmParams = useMemo(() => ({
     source: searchParams.get('utm_source'),
@@ -293,7 +325,7 @@ const BrandBioPage = () => {
         style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
         {/* Hero Section */}
-        {templateConfig.heroStyle !== 'none' && (
+        {isSectionVisible('hero') && templateConfig.heroStyle !== 'none' && (
           <div className={cn("relative overflow-hidden", heroHeight)}>
             {brand.hero_video_url ? (
               <>
@@ -369,8 +401,8 @@ const BrandBioPage = () => {
           </div>
         )}
 
-        {/* Minimal header for "none" hero style */}
-        {templateConfig.heroStyle === 'none' && (
+        {/* Minimal header for "none" hero style or hidden hero */}
+        {(!isSectionVisible('hero') || templateConfig.heroStyle === 'none') && (
           <div className="px-5 pt-8 pb-4 text-center">
             {brand.logo_url && (
               <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center p-3 mb-3">
@@ -393,7 +425,7 @@ const BrandBioPage = () => {
         )}
 
         {/* Content */}
-        <div className={cn("px-5 pb-8", templateConfig.heroStyle !== 'none' && "pt-4")}>
+        <div className={cn("px-5 pb-8", (isSectionVisible('hero') && templateConfig.heroStyle !== 'none') && "pt-4")}>
         {linksLoading ? (
           <div className="space-y-4 mt-6">
             <Skeleton className="h-14 w-full" />
@@ -403,42 +435,44 @@ const BrandBioPage = () => {
         ) : (
           <>
             {/* Hero CTA Banner */}
-            <div 
-              className={cn("mt-6 mb-8 p-8 text-center", getButtonStyle())}
-              style={{ 
-                background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` 
-              }}
-            >
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Start Your Journey Today!
-              </h2>
-              <p className="text-white/90 text-sm mb-4">
-                Experience the excitement with a FREE trial class
-              </p>
-              <button
-                onClick={() => {
-                  if (brand.primary_cta_url) {
-                    trackClick.mutate({
-                      brandLinkId: brand.id,
-                      utmSource: utmParams.source,
-                      utmMedium: utmParams.medium,
-                      utmCampaign: utmParams.campaign,
-                    });
-                    window.open(brand.primary_cta_url, "_blank");
-                  }
+            {isSectionVisible('cta') && (
+              <div 
+                className={cn("mt-6 mb-8 p-8 text-center", getButtonStyle())}
+                style={{ 
+                  background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` 
                 }}
-                className={cn(
-                  "px-8 py-3 bg-white font-semibold hover:shadow-lg transition-all active:scale-[0.98]",
-                  getButtonStyle()
-                )}
-                style={{ color: brand.color }}
               >
-                {brand.primary_cta_text || 'Request Your Free Trial'}
-              </button>
-            </div>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  Start Your Journey Today!
+                </h2>
+                <p className="text-white/90 text-sm mb-4">
+                  Experience the excitement with a FREE trial class
+                </p>
+                <button
+                  onClick={() => {
+                    if (brand.primary_cta_url) {
+                      trackClick.mutate({
+                        brandLinkId: brand.id,
+                        utmSource: utmParams.source,
+                        utmMedium: utmParams.medium,
+                        utmCampaign: utmParams.campaign,
+                      });
+                      window.open(brand.primary_cta_url, "_blank");
+                    }
+                  }}
+                  className={cn(
+                    "px-8 py-3 bg-white font-semibold hover:shadow-lg transition-all active:scale-[0.98]",
+                    getButtonStyle()
+                  )}
+                  style={{ color: brand.color }}
+                >
+                  {brand.primary_cta_text || 'Request Your Free Trial'}
+                </button>
+              </div>
+            )}
 
             {/* Quick Actions Section */}
-            {featuredLinks.length > 0 && (
+            {isSectionVisible('quickActions') && featuredLinks.length > 0 && (
               <div className="mb-8">
                 {templateConfig.showCategories && (
                   <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 flex items-center gap-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
@@ -468,12 +502,12 @@ const BrandBioPage = () => {
             )}
 
             {/* Divider */}
-            {featuredLinks.length > 0 && Object.keys(groupedLinks).length > 0 && (
+            {isSectionVisible('quickActions') && featuredLinks.length > 0 && isSectionVisible('links') && Object.keys(groupedLinks).length > 0 && (
               <div className={cn("border-t my-6", isDarkMode ? "border-gray-700" : "border-border")} />
             )}
 
             {/* Regular Links by Category */}
-            {Object.entries(groupedLinks).map(([categoryName, categoryLinks]) => (
+            {isSectionVisible('links') && Object.entries(groupedLinks).map(([categoryName, categoryLinks]) => (
               <div key={categoryName} className="mb-6">
                 {templateConfig.showCategories && (
                   <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
@@ -513,7 +547,7 @@ const BrandBioPage = () => {
             ))}
 
             {/* Social Media Buttons */}
-            {(brand.facebook_url || brand.instagram_url) && (
+            {isSectionVisible('social') && (brand.facebook_url || brand.instagram_url) && (
               <>
                 <div className={cn("border-t my-8", isDarkMode ? "border-gray-700" : "border-border")} />
                 {templateConfig.showCategories && (
@@ -566,30 +600,32 @@ const BrandBioPage = () => {
             )}
 
             {/* Footer */}
-            <div className={cn("mt-8 pt-6 border-t", isDarkMode ? "border-gray-700" : "border-border")}>
-              <div className={cn(
-                "rounded-xl p-4 mb-4 text-center",
-                isDarkMode ? "bg-gray-800" : "bg-muted/30"
-              )}>
-                <p className={cn("font-bold mb-2", isDarkMode ? "text-white" : "text-foreground")}>{brand.name}</p>
-                {brand.address && (
-                  <p className="text-sm text-muted-foreground mb-1">
-                    {brand.address}
-                    {brand.city && brand.state && `, ${brand.city}, ${brand.state}`}
-                  </p>
-                )}
-                {brand.phone && (
-                  <p className="text-sm font-medium mt-2 flex items-center justify-center gap-2">
-                    <span>📞</span>
-                    <span style={{ color: brand.color }}>{brand.phone}</span>
-                  </p>
-                )}
+            {isSectionVisible('footer') && (
+              <div className={cn("mt-8 pt-6 border-t", isDarkMode ? "border-gray-700" : "border-border")}>
+                <div className={cn(
+                  "rounded-xl p-4 mb-4 text-center",
+                  isDarkMode ? "bg-gray-800" : "bg-muted/30"
+                )}>
+                  <p className={cn("font-bold mb-2", isDarkMode ? "text-white" : "text-foreground")}>{brand.name}</p>
+                  {brand.address && (
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {brand.address}
+                      {brand.city && brand.state && `, ${brand.city}, ${brand.state}`}
+                    </p>
+                  )}
+                  {brand.phone && (
+                    <p className="text-sm font-medium mt-2 flex items-center justify-center gap-2">
+                      <span>📞</span>
+                      <span style={{ color: brand.color }}>{brand.phone}</span>
+                    </p>
+                  )}
+                </div>
+                
+                <p className="text-xs text-center text-muted-foreground">
+                  © {new Date().getFullYear()} {brand.name}
+                </p>
               </div>
-              
-              <p className="text-xs text-center text-muted-foreground">
-                © {new Date().getFullYear()} {brand.name}
-              </p>
-            </div>
+            )}
           </>
         )}
         </div>

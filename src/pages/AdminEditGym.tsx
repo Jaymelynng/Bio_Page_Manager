@@ -12,6 +12,7 @@ import { ArrowLeft, Save, Loader2, ExternalLink, Plus, Layout } from 'lucide-rea
 import { z } from 'zod';
 import TemplateSelector from '@/components/TemplateSelector';
 import DraggableLinks from '@/components/DraggableLinks';
+import SectionEditor, { Section } from '@/components/SectionEditor';
 
 const brandSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -35,7 +36,7 @@ const brandSchema = z.object({
   parent_portal_url: z.string().url("Invalid URL").optional().nullable().or(z.literal('')),
 });
 
-type Brand = z.infer<typeof brandSchema> & { id: string; handle: string; template_id: string | null };
+type Brand = z.infer<typeof brandSchema> & { id: string; handle: string; template_id: string | null; section_config: unknown };
 
 interface BrandLink {
   id: string;
@@ -61,6 +62,7 @@ export default function AdminEditGym() {
   const [brand, setBrand] = useState<Brand | null>(null);
   const [links, setLinks] = useState<BrandLink[]>([]);
   const [categories, setCategories] = useState<LinkCategory[]>([]);
+  const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -88,6 +90,19 @@ export default function AdminEditGym() {
       }
 
       setBrand(brandData);
+      
+      // Initialize sections from brand config or use defaults
+      const defaultSections: Section[] = [
+        { id: 'hero', name: 'Hero Banner', visible: true, order: 1 },
+        { id: 'cta', name: 'Call to Action', visible: true, order: 2 },
+        { id: 'quickActions', name: 'Quick Actions', visible: true, order: 3 },
+        { id: 'links', name: 'Links by Category', visible: true, order: 4 },
+        { id: 'social', name: 'Social Media', visible: true, order: 5 },
+        { id: 'footer', name: 'Contact & Footer', visible: true, order: 6 },
+      ];
+      
+      const sectionConfig = brandData.section_config as unknown as { sections: Section[] } | null;
+      setSections(sectionConfig?.sections || defaultSections);
 
       const [linksResult, categoriesResult] = await Promise.all([
         supabase
@@ -129,6 +144,29 @@ export default function AdminEditGym() {
 
   const handleLinksReorder = (newLinks: BrandLink[]) => {
     setLinks(newLinks);
+  };
+
+  const handleSectionsChange = (newSections: Section[]) => {
+    setSections(newSections);
+  };
+
+  const saveSections = async () => {
+    if (!brand) return;
+    
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from('brands')
+        .update({ section_config: { sections: sections.map(s => ({ id: s.id, name: s.name, visible: s.visible, order: s.order })) } as unknown as undefined })
+        .eq('id', brand.id);
+
+      if (error) throw error;
+      toast({ title: 'Section layout saved!' });
+    } catch (error: any) {
+      toast({ title: 'Error saving sections', description: error.message, variant: 'destructive' });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleTemplateSelect = async (templateId: string) => {
@@ -583,11 +621,29 @@ export default function AdminEditGym() {
           </TabsContent>
 
           {/* Layout Tab */}
-          <TabsContent value="layout">
+          <TabsContent value="layout" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Page Layout</CardTitle>
-                <CardDescription>Choose a template style for your bio page</CardDescription>
+                <CardTitle>Section Order & Visibility</CardTitle>
+                <CardDescription>Drag to reorder sections and toggle visibility</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SectionEditor
+                  sections={sections}
+                  onChange={handleSectionsChange}
+                  brandColor={brand.color}
+                />
+                <Button onClick={saveSections} disabled={saving} className="w-full mt-6">
+                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+                  Save Section Layout
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Template Style</CardTitle>
+                <CardDescription>Choose a style preset for buttons, fonts, and colors</CardDescription>
               </CardHeader>
               <CardContent>
                 <TemplateSelector
