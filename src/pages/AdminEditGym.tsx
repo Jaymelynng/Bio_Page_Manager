@@ -8,8 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Loader2, ExternalLink, Trash2, Plus } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, ExternalLink, Plus, Layout } from 'lucide-react';
 import { z } from 'zod';
+import TemplateSelector from '@/components/TemplateSelector';
+import DraggableLinks from '@/components/DraggableLinks';
 
 const brandSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -33,7 +35,7 @@ const brandSchema = z.object({
   parent_portal_url: z.string().url("Invalid URL").optional().nullable().or(z.literal('')),
 });
 
-type Brand = z.infer<typeof brandSchema> & { id: string; handle: string };
+type Brand = z.infer<typeof brandSchema> & { id: string; handle: string; template_id: string | null };
 
 interface BrandLink {
   id: string;
@@ -72,7 +74,6 @@ export default function AdminEditGym() {
   const fetchBrand = async () => {
     setLoading(true);
     try {
-      // Fetch brand, links, and categories in parallel
       const { data: brandData, error: brandError } = await supabase
         .from('brands')
         .select('*')
@@ -113,7 +114,7 @@ export default function AdminEditGym() {
     }
   };
 
-  const handleBrandChange = (field: keyof Brand, value: string) => {
+  const handleBrandChange = (field: keyof Brand, value: string | null) => {
     if (brand) {
       setBrand({ ...brand, [field]: value || null });
       setErrors({ ...errors, [field]: '' });
@@ -126,10 +127,32 @@ export default function AdminEditGym() {
     ));
   };
 
+  const handleLinksReorder = (newLinks: BrandLink[]) => {
+    setLinks(newLinks);
+  };
+
+  const handleTemplateSelect = async (templateId: string) => {
+    if (!brand) return;
+    
+    setBrand({ ...brand, template_id: templateId });
+    
+    // Save immediately
+    try {
+      const { error } = await supabase
+        .from('brands')
+        .update({ template_id: templateId })
+        .eq('id', brand.id);
+
+      if (error) throw error;
+      toast({ title: 'Template applied!' });
+    } catch (error: any) {
+      toast({ title: 'Error saving template', description: error.message, variant: 'destructive' });
+    }
+  };
+
   const saveBrand = async () => {
     if (!brand) return;
     
-    // Validate
     const result = brandSchema.safeParse(brand);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -224,7 +247,6 @@ export default function AdminEditGym() {
   const addLink = async () => {
     if (!brand) return;
     
-    // Get the default category (first active one)
     const defaultCategory = categories[0];
     if (!defaultCategory) {
       toast({ title: 'No categories available', variant: 'destructive' });
@@ -289,9 +311,13 @@ export default function AdminEditGym() {
         </div>
 
         <Tabs defaultValue="details" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="branding">Branding</TabsTrigger>
+            <TabsTrigger value="layout" className="flex items-center gap-1">
+              <Layout className="h-3 w-3" />
+              Layout
+            </TabsTrigger>
             <TabsTrigger value="links">Links ({links.length})</TabsTrigger>
           </TabsList>
 
@@ -556,13 +582,30 @@ export default function AdminEditGym() {
             </Card>
           </TabsContent>
 
+          {/* Layout Tab */}
+          <TabsContent value="layout">
+            <Card>
+              <CardHeader>
+                <CardTitle>Page Layout</CardTitle>
+                <CardDescription>Choose a template style for your bio page</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TemplateSelector
+                  selectedTemplateId={brand.template_id}
+                  brandColor={brand.color}
+                  onSelect={handleTemplateSelect}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Links Tab */}
           <TabsContent value="links">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Manage Links</CardTitle>
-                  <CardDescription>Edit the links displayed on the gym page</CardDescription>
+                  <CardDescription>Drag to reorder, edit, or delete links</CardDescription>
                 </div>
                 <Button onClick={addLink} size="sm">
                   <Plus className="h-4 w-4 mr-2" />
@@ -570,73 +613,12 @@ export default function AdminEditGym() {
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
-                {links.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No links yet</p>
-                ) : (
-                  <div className="space-y-4">
-                    {links.map((link, index) => (
-                      <div key={link.id} className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
-                        <div className="flex-1 space-y-3">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div>
-                              <Label className="text-xs">Title</Label>
-                              <Input
-                                value={link.title}
-                                onChange={(e) => handleLinkChange(link.id, 'title', e.target.value)}
-                                placeholder="Link Title"
-                              />
-                            </div>
-                            <div className="md:col-span-2">
-                              <Label className="text-xs">URL</Label>
-                              <Input
-                                value={link.url}
-                                onChange={(e) => handleLinkChange(link.id, 'url', e.target.value)}
-                                placeholder="https://..."
-                              />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div>
-                              <Label className="text-xs">Icon (emoji)</Label>
-                              <Input
-                                value={link.icon || ''}
-                                onChange={(e) => handleLinkChange(link.id, 'icon', e.target.value)}
-                                placeholder="📚"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs">Order</Label>
-                              <Input
-                                type="number"
-                                value={link.display_order}
-                                onChange={(e) => handleLinkChange(link.id, 'display_order', parseInt(e.target.value) || 0)}
-                              />
-                            </div>
-                            <div className="flex items-end">
-                              <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={link.is_featured}
-                                  onChange={(e) => handleLinkChange(link.id, 'is_featured', e.target.checked)}
-                                  className="w-4 h-4"
-                                />
-                                <span className="text-sm">Featured</span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteLink(link.id)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <DraggableLinks
+                  links={links}
+                  onLinksReorder={handleLinksReorder}
+                  onLinkChange={handleLinkChange}
+                  onDeleteLink={deleteLink}
+                />
 
                 <Button onClick={saveLinks} disabled={saving} className="w-full">
                   {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}

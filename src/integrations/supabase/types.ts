@@ -229,6 +229,7 @@ export type Database = {
           short_code: string | null
           state: string | null
           tagline: string | null
+          template_id: string | null
           updated_at: string
           website_url: string | null
         }
@@ -259,6 +260,7 @@ export type Database = {
           short_code?: string | null
           state?: string | null
           tagline?: string | null
+          template_id?: string | null
           updated_at?: string
           website_url?: string | null
         }
@@ -289,10 +291,19 @@ export type Database = {
           short_code?: string | null
           state?: string | null
           tagline?: string | null
+          template_id?: string | null
           updated_at?: string
           website_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "brands_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "page_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       campaigns: {
         Row: {
@@ -589,6 +600,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          is_active: boolean
+          layout_config: Json
+          name: string
+          preview_image: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          layout_config?: Json
+          name: string
+          preview_image?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          layout_config?: Json
+          name?: string
+          preview_image?: string | null
+        }
+        Relationships: []
       }
       sessions: {
         Row: {
