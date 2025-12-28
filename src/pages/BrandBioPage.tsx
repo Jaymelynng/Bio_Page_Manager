@@ -1,7 +1,8 @@
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
-import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail, BookOpen, Target, Moon, Star, PartyPopper, User } from "lucide-react";
+import { usePinAuth } from "@/hooks/usePinAuth";
+import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail, BookOpen, Target, Moon, Star, PartyPopper, User, Settings, BarChart3, LayoutDashboard } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState, useMemo } from "react";
 
@@ -9,6 +10,7 @@ const BrandBioPage = () => {
   const { handle } = useParams<{ handle: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isAuthenticated } = usePinAuth();
   const { data: brand, isLoading: brandLoading } = useBrand(handle || "");
   const { data: links, isLoading: linksLoading } = useBrandLinks(brand?.id || "");
   const trackClick = useTrackLinkClick();
@@ -198,6 +200,37 @@ const BrandBioPage = () => {
         background: `linear-gradient(135deg, ${brand.color} 0%, ${secondaryColor} 100%)`
       }}
     >
+      {/* Admin Toolbar - only visible when authenticated */}
+      {isAuthenticated && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm text-white py-2 px-4">
+          <div className="max-w-md mx-auto flex items-center justify-between">
+            <span className="text-sm font-medium">Admin Mode</span>
+            <div className="flex items-center gap-2">
+              <Link 
+                to="/biopage"
+                className="flex items-center gap-1 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <LayoutDashboard className="w-3 h-3" />
+                Dashboard
+              </Link>
+              <Link 
+                to={`/biopage/admin/edit/${handle}`}
+                className="flex items-center gap-1 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <Settings className="w-3 h-3" />
+                Edit
+              </Link>
+              <Link 
+                to={`/biopage/admin/analytics`}
+                className="flex items-center gap-1 px-3 py-1 text-xs bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <BarChart3 className="w-3 h-3" />
+                Analytics
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Animated background pattern */}
       <div 
         className="fixed inset-0 pointer-events-none"

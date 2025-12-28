@@ -45,6 +45,12 @@ interface BrandLink {
   category_id: string;
 }
 
+interface LinkCategory {
+  id: string;
+  name: string;
+  display_order: number;
+}
+
 export default function AdminEditGym() {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
@@ -52,6 +58,7 @@ export default function AdminEditGym() {
   
   const [brand, setBrand] = useState<Brand | null>(null);
   const [links, setLinks] = useState<BrandLink[]>([]);
+  const [categories, setCategories] = useState<LinkCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -65,6 +72,7 @@ export default function AdminEditGym() {
   const fetchBrand = async () => {
     setLoading(true);
     try {
+      // Fetch brand, links, and categories in parallel
       const { data: brandData, error: brandError } = await supabase
         .from('brands')
         .select('*')
@@ -80,14 +88,24 @@ export default function AdminEditGym() {
 
       setBrand(brandData);
 
-      const { data: linksData, error: linksError } = await supabase
-        .from('brand_links')
-        .select('*')
-        .eq('brand_id', brandData.id)
-        .order('display_order');
+      const [linksResult, categoriesResult] = await Promise.all([
+        supabase
+          .from('brand_links')
+          .select('*')
+          .eq('brand_id', brandData.id)
+          .order('display_order'),
+        supabase
+          .from('link_categories')
+          .select('id, name, display_order')
+          .eq('is_active', true)
+          .order('display_order')
+      ]);
 
-      if (linksError) throw linksError;
-      setLinks(linksData || []);
+      if (linksResult.error) throw linksResult.error;
+      if (categoriesResult.error) throw categoriesResult.error;
+      
+      setLinks(linksResult.data || []);
+      setCategories(categoriesResult.data || []);
     } catch (error: any) {
       toast({ title: 'Error loading gym', description: error.message, variant: 'destructive' });
     } finally {
@@ -200,6 +218,41 @@ export default function AdminEditGym() {
       toast({ title: 'Link deleted' });
     } catch (error: any) {
       toast({ title: 'Error deleting link', description: error.message, variant: 'destructive' });
+    }
+  };
+
+  const addLink = async () => {
+    if (!brand) return;
+    
+    // Get the default category (first active one)
+    const defaultCategory = categories[0];
+    if (!defaultCategory) {
+      toast({ title: 'No categories available', variant: 'destructive' });
+      return;
+    }
+
+    const maxOrder = links.reduce((max, link) => Math.max(max, link.display_order), 0);
+    
+    try {
+      const { data, error } = await supabase
+        .from('brand_links')
+        .insert({
+          brand_id: brand.id,
+          title: 'New Link',
+          url: 'https://',
+          icon: '🔗',
+          is_featured: false,
+          display_order: maxOrder + 1,
+          category_id: defaultCategory.id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setLinks([...links, data]);
+      toast({ title: 'Link added! Edit it below.' });
+    } catch (error: any) {
+      toast({ title: 'Error adding link', description: error.message, variant: 'destructive' });
     }
   };
 
@@ -506,9 +559,15 @@ export default function AdminEditGym() {
           {/* Links Tab */}
           <TabsContent value="links">
             <Card>
-              <CardHeader>
-                <CardTitle>Manage Links</CardTitle>
-                <CardDescription>Edit the links displayed on the gym page</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Manage Links</CardTitle>
+                  <CardDescription>Edit the links displayed on the gym page</CardDescription>
+                </div>
+                <Button onClick={addLink} size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Link
+                </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 {links.length === 0 ? (
