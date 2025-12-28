@@ -226,6 +226,7 @@ export type Database = {
           primary_cta_url: string | null
           rating: number | null
           rating_count: number | null
+          section_config: Json | null
           short_code: string | null
           state: string | null
           tagline: string | null
@@ -257,6 +258,7 @@ export type Database = {
           primary_cta_url?: string | null
           rating?: number | null
           rating_count?: number | null
+          section_config?: Json | null
           short_code?: string | null
           state?: string | null
           tagline?: string | null
@@ -288,6 +290,7 @@ export type Database = {
           primary_cta_url?: string | null
           rating?: number | null
           rating_count?: number | null
+          section_config?: Json | null
           short_code?: string | null
           state?: string | null
           tagline?: string | null
