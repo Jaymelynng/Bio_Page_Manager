@@ -2,9 +2,11 @@ import { useParams, useNavigate, useSearchParams, Link } from "react-router-dom"
 import { useBrand } from "@/hooks/useBrands";
 import { useBrandLinks, useTrackLinkClick } from "@/hooks/useBrandLinks";
 import { usePinAuth } from "@/hooks/usePinAuth";
+import { useTemplate } from "@/hooks/useTemplates";
 import { Phone, MapPin, Gift, Calendar, Facebook, Instagram, MessageCircle, Mail, BookOpen, Target, Moon, Star, PartyPopper, User, Settings, BarChart3, LayoutDashboard } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect, useState, useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 const BrandBioPage = () => {
   const { handle } = useParams<{ handle: string }>();
@@ -13,8 +15,19 @@ const BrandBioPage = () => {
   const { isAuthenticated } = usePinAuth();
   const { data: brand, isLoading: brandLoading } = useBrand(handle || "");
   const { data: links, isLoading: linksLoading } = useBrandLinks(brand?.id || "");
+  const { data: template } = useTemplate(brand?.template_id || null);
   const trackClick = useTrackLinkClick();
   const [isShiftStarActive, setIsShiftStarActive] = useState(false);
+
+  // Template config with defaults
+  const templateConfig = useMemo(() => template?.layout_config || {
+    heroStyle: 'full',
+    buttonStyle: 'rounded',
+    colorScheme: 'light',
+    fontFamily: 'sans',
+    spacing: 'normal',
+    showCategories: true,
+  }, [template]);
 
   // Capture UTM parameters from URL
   const utmParams = useMemo(() => ({
@@ -28,7 +41,6 @@ const BrandBioPage = () => {
     if (brand?.name) {
       document.title = `${brand.name} | BioHub`;
       
-      // Update OG meta tags for social media previews
       const updateMetaTag = (property: string, content: string) => {
         let meta = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement;
         if (!meta) {
@@ -52,13 +64,11 @@ const BrandBioPage = () => {
       const description = brand.tagline || `${brand.name} - Classes, schedules, and more.`;
       const imageUrl = brand.logo_url || '';
       
-      // Open Graph tags
       updateMetaTag('og:title', brand.name);
       updateMetaTag('og:description', description);
       updateMetaTag('og:image', imageUrl);
       updateMetaTag('og:type', 'website');
       
-      // Twitter tags
       updateNameMetaTag('twitter:card', 'summary');
       updateNameMetaTag('twitter:title', brand.name);
       updateNameMetaTag('twitter:description', description);
@@ -94,7 +104,6 @@ const BrandBioPage = () => {
   }, []);
 
   const handleLinkClick = (linkId: string, url: string, linkTitle: string) => {
-    // Secret combo: Shift + * + click gift certificate
     if (isShiftStarActive && linkTitle.toLowerCase().includes('gift')) {
       navigate('/');
       return;
@@ -109,14 +118,48 @@ const BrandBioPage = () => {
     window.open(url, "_blank");
   };
 
-  // Get secondary color or fallback (with safe access)
   const secondaryColor = brand?.color_secondary || brand?.color || '#1f53a3';
   const tertiaryColor = brand?.color_tertiary || '#ffffff';
   
-  // Conditional hero height for Capital Cedar Park (narrower video)
-  const heroHeight = brand?.handle === 'capital-gym-cedar-park' 
-    ? 'h-[280px] md:h-[380px]' 
-    : 'h-[300px] md:h-[400px]';
+  // Template-based hero height
+  const heroHeight = useMemo(() => {
+    if (templateConfig.heroStyle === 'none') return 'h-0';
+    if (templateConfig.heroStyle === 'split') return 'h-[200px] md:h-[280px]';
+    if (brand?.handle === 'capital-gym-cedar-park') return 'h-[280px] md:h-[380px]';
+    return 'h-[300px] md:h-[400px]';
+  }, [templateConfig.heroStyle, brand?.handle]);
+
+  // Template-based button styles
+  const getButtonStyle = () => {
+    switch (templateConfig.buttonStyle) {
+      case 'square': return 'rounded-none';
+      case 'pill': return 'rounded-full';
+      case 'outline': return 'rounded-lg border-2 bg-transparent';
+      default: return 'rounded-xl';
+    }
+  };
+
+  // Template-based spacing
+  const getSpacing = () => {
+    switch (templateConfig.spacing) {
+      case 'compact': return 'space-y-2';
+      case 'relaxed': return 'space-y-4';
+      default: return 'space-y-3';
+    }
+  };
+
+  // Template-based font
+  const getFontClass = () => {
+    switch (templateConfig.fontFamily) {
+      case 'serif': return 'font-serif';
+      case 'bold': return 'font-black';
+      case 'elegant': return 'tracking-wide';
+      default: return '';
+    }
+  };
+
+  // Dark mode background
+  const isDarkMode = templateConfig.colorScheme === 'dark';
 
   if (brandLoading) {
     return (
@@ -136,10 +179,7 @@ const BrandBioPage = () => {
     );
   }
 
-  // Get featured links
   const featuredLinks = links?.filter((link: any) => link.is_featured) || [];
-  
-  // Group non-featured links by category
   const regularLinks = links?.filter((link: any) => !link.is_featured) || [];
   const groupedLinks = regularLinks.reduce((acc, link: any) => {
     const categoryName = link.category?.name || "Other";
@@ -151,7 +191,6 @@ const BrandBioPage = () => {
   }, {} as Record<string, any[]>);
 
   const getIconForLink = (title: string, iconName?: string): JSX.Element | string | null => {
-    // Map database icon text to Lucide React components
     const iconMap: Record<string, JSX.Element> = {
       'Phone': <Phone className="w-5 h-5" />,
       'Mail': <Mail className="w-5 h-5" />,
@@ -169,17 +208,14 @@ const BrandBioPage = () => {
       'User': <User className="w-5 h-5" />,
     };
     
-    // If it's an emoji (not a Lucide component name), return it directly
     if (iconName && !iconMap[iconName]) {
       return iconName;
     }
     
-    // If database has a Lucide icon name, use it
     if (iconName && iconMap[iconName]) {
       return iconMap[iconName];
     }
     
-    // Otherwise detect from title
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('call') || lowerTitle.includes('phone')) return <Phone className="w-5 h-5" />;
     if (lowerTitle.includes('email') || lowerTitle.includes('mail')) return <Mail className="w-5 h-5" />;
@@ -195,12 +231,14 @@ const BrandBioPage = () => {
 
   return (
     <div 
-      className="min-h-screen relative overflow-hidden px-4"
+      className={cn("min-h-screen relative overflow-hidden px-4", getFontClass())}
       style={{
-        background: `linear-gradient(135deg, ${brand.color} 0%, ${secondaryColor} 100%)`
+        background: isDarkMode 
+          ? `linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)`
+          : `linear-gradient(135deg, ${brand.color} 0%, ${secondaryColor} 100%)`
       }}
     >
-      {/* Admin Toolbar - only visible when authenticated */}
+      {/* Admin Toolbar */}
       {isAuthenticated && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm text-white py-2 px-4">
           <div className="max-w-md mx-auto flex items-center justify-between">
@@ -231,6 +269,7 @@ const BrandBioPage = () => {
           </div>
         </div>
       )}
+
       {/* Animated background pattern */}
       <div 
         className="fixed inset-0 pointer-events-none"
@@ -245,65 +284,96 @@ const BrandBioPage = () => {
         }}
       />
 
-      {/* White content container */}
+      {/* Content container */}
       <div 
-        className="max-w-md mx-auto bg-white rounded-3xl overflow-hidden shadow-2xl relative z-10"
+        className={cn(
+          "max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl relative z-10",
+          isDarkMode ? "bg-gray-900 text-white" : "bg-white"
+        )}
         style={{ animation: 'slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1)' }}
       >
-        {/* Hero Section with Video Background */}
-        <div className={`relative ${heroHeight} overflow-hidden`}>
-          {brand.hero_video_url ? (
-            <>
-              {/* Blurred background for narrow videos */}
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                preload="metadata"
-                className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
-                src={brand.hero_video_url}
-              />
-              
-              {/* Main video */}
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                preload="metadata"
-                className="absolute inset-0 w-full h-full object-contain"
-                src={brand.hero_video_url}
-              />
-              
-              {/* Gradient overlay with brand colors */}
+        {/* Hero Section */}
+        {templateConfig.heroStyle !== 'none' && (
+          <div className={cn("relative overflow-hidden", heroHeight)}>
+            {brand.hero_video_url ? (
+              <>
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  preload="metadata"
+                  className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
+                  src={brand.hero_video_url}
+                />
+                
+                <video 
+                  autoPlay 
+                  loop 
+                  muted 
+                  playsInline
+                  preload="metadata"
+                  className="absolute inset-0 w-full h-full object-contain"
+                  src={brand.hero_video_url}
+                />
+                
+                <div 
+                  className="absolute inset-0 z-10"
+                  style={{
+                    background: `linear-gradient(180deg, 
+                      ${brand.color}b3 0%, 
+                      ${brand.color}d9 50%, 
+                      ${secondaryColor}e6 100%)`
+                  }}
+                />
+              </>
+            ) : (
               <div 
-                className="absolute inset-0 z-10"
-                style={{
+                className="absolute inset-0"
+                style={{ 
                   background: `linear-gradient(180deg, 
                     ${brand.color}b3 0%, 
                     ${brand.color}d9 50%, 
                     ${secondaryColor}e6 100%)`
                 }}
               />
-            </>
-          ) : (
-            /* Fallback gradient if no video */
-            <div 
-              className="absolute inset-0"
-              style={{ 
-                background: `linear-gradient(180deg, 
-                  ${brand.color}b3 0%, 
-                  ${brand.color}d9 50%, 
-                  ${secondaryColor}e6 100%)`
-              }}
-            />
-          )}
-          
-          {/* Content overlay (logo, name, location) */}
-          <div className="relative z-20 h-full flex flex-col items-center justify-center px-4">
+            )}
+            
+            <div className="relative z-20 h-full flex flex-col items-center justify-center px-4">
+              {brand.logo_url && (
+                <div className={cn(
+                  "bg-white rounded-full flex items-center justify-center shadow-2xl mb-4",
+                  templateConfig.heroStyle === 'split' ? 'w-24 h-24 p-3' : 'w-32 h-32 p-4'
+                )}>
+                  <img 
+                    src={brand.logo_url} 
+                    alt={brand.name}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              
+              <h1 className={cn(
+                "font-bold text-white mb-1 drop-shadow-lg",
+                templateConfig.heroStyle === 'split' ? 'text-2xl' : 'text-3xl'
+              )}>
+                {brand.name}
+              </h1>
+              
+              {(brand.city || brand.state) && (
+                <p className="text-white/95 text-sm drop-shadow-md">
+                  {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Minimal header for "none" hero style */}
+        {templateConfig.heroStyle === 'none' && (
+          <div className="px-5 pt-8 pb-4 text-center">
             {brand.logo_url && (
-              <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center p-4 shadow-2xl mb-4">
+              <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center p-3 mb-3">
                 <img 
                   src={brand.logo_url} 
                   alt={brand.name}
@@ -311,21 +381,19 @@ const BrandBioPage = () => {
                 />
               </div>
             )}
-            
-            <h1 className="text-3xl font-bold text-white mb-1 drop-shadow-lg">
+            <h1 className="text-xl font-bold" style={{ color: isDarkMode ? 'white' : brand.color }}>
               {brand.name}
             </h1>
-            
             {(brand.city || brand.state) && (
-              <p className="text-white/95 text-sm drop-shadow-md">
+              <p className="text-sm text-muted-foreground">
                 {brand.city}{brand.city && brand.state ? ', ' : ''}{brand.state}
               </p>
             )}
           </div>
-        </div>
+        )}
 
         {/* Content */}
-        <div className="px-5 pb-8 pt-4">
+        <div className={cn("px-5 pb-8", templateConfig.heroStyle !== 'none' && "pt-4")}>
         {linksLoading ? (
           <div className="space-y-4 mt-6">
             <Skeleton className="h-14 w-full" />
@@ -336,7 +404,7 @@ const BrandBioPage = () => {
           <>
             {/* Hero CTA Banner */}
             <div 
-              className="mt-6 mb-8 rounded-2xl p-8 text-center"
+              className={cn("mt-6 mb-8 p-8 text-center", getButtonStyle())}
               style={{ 
                 background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` 
               }}
@@ -359,30 +427,37 @@ const BrandBioPage = () => {
                     window.open(brand.primary_cta_url, "_blank");
                   }
                 }}
-                className="px-8 py-3 bg-white rounded-xl font-semibold hover:shadow-lg transition-all active:scale-[0.98]"
+                className={cn(
+                  "px-8 py-3 bg-white font-semibold hover:shadow-lg transition-all active:scale-[0.98]",
+                  getButtonStyle()
+                )}
                 style={{ color: brand.color }}
               >
-                Request Your Free Trial
+                {brand.primary_cta_text || 'Request Your Free Trial'}
               </button>
             </div>
 
             {/* Quick Actions Section */}
             {featuredLinks.length > 0 && (
               <div className="mb-8">
-                <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 flex items-center gap-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
-                  Quick Actions
-                </h2>
+                {templateConfig.showCategories && (
+                  <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 flex items-center gap-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
+                    Quick Actions
+                  </h2>
+                )}
                 
-                {/* 2x2 Grid for first 4 featured links (excluding trial) */}
                 {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).length > 0 && (
                   <div className="grid grid-cols-2 gap-3">
                     {featuredLinks.filter(link => !link.title.toLowerCase().includes('trial')).slice(0, 4).map((link: any) => (
-                  <button
-                    key={link.id}
-                    onClick={() => handleLinkClick(link.id, link.url, link.title)}
-                    className="py-6 px-4 rounded-xl font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2"
-                    style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
-                  >
+                      <button
+                        key={link.id}
+                        onClick={() => handleLinkClick(link.id, link.url, link.title)}
+                        className={cn(
+                          "py-6 px-4 font-semibold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-2",
+                          getButtonStyle()
+                        )}
+                        style={{ background: `linear-gradient(135deg, ${brand.color}, ${secondaryColor})` }}
+                      >
                         <span className="text-3xl">{getIconForLink(link.title, link.icon)}</span>
                         <span className="text-sm text-center">{link.title}</span>
                       </button>
@@ -394,31 +469,41 @@ const BrandBioPage = () => {
 
             {/* Divider */}
             {featuredLinks.length > 0 && Object.keys(groupedLinks).length > 0 && (
-              <div className="border-t border-border my-6" />
+              <div className={cn("border-t my-6", isDarkMode ? "border-gray-700" : "border-border")} />
             )}
 
             {/* Regular Links by Category */}
             {Object.entries(groupedLinks).map(([categoryName, categoryLinks]) => (
               <div key={categoryName} className="mb-6">
-                <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
-                  {categoryName}
-                </h2>
-                <div className="space-y-2">
+                {templateConfig.showCategories && (
+                  <h2 className="text-sm font-bold uppercase tracking-wider mb-3 px-2 pb-2 border-b-2" style={{ color: brand.color, borderColor: brand.color }}>
+                    {categoryName}
+                  </h2>
+                )}
+                <div className={getSpacing()}>
                   {categoryLinks.map((link: any) => (
-                  <button
-                    key={link.id}
-                    onClick={() => handleLinkClick(link.id, link.url, link.title)}
-                    className="w-full py-3 px-4 rounded-lg text-left transition-all flex items-center justify-between border-2 hover:scale-[1.02] hover:shadow-md"
-                    style={{
-                      background: `linear-gradient(135deg, ${brand.color}08, ${secondaryColor}05)`,
-                      borderColor: `${brand.color}30`,
-                    }}
-                  >
+                    <button
+                      key={link.id}
+                      onClick={() => handleLinkClick(link.id, link.url, link.title)}
+                      className={cn(
+                        "w-full py-3 px-4 text-left transition-all flex items-center justify-between hover:scale-[1.02] hover:shadow-md",
+                        getButtonStyle(),
+                        templateConfig.buttonStyle === 'outline' ? 'border-2' : ''
+                      )}
+                      style={{
+                        background: templateConfig.buttonStyle === 'outline' 
+                          ? 'transparent'
+                          : `linear-gradient(135deg, ${brand.color}08, ${secondaryColor}05)`,
+                        borderColor: templateConfig.buttonStyle === 'outline' 
+                          ? brand.color 
+                          : `${brand.color}30`,
+                      }}
+                    >
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">
                           {getIconForLink(link.title, link.icon)}
                         </span>
-                        <span className="font-medium text-foreground">{link.title}</span>
+                        <span className={cn("font-medium", isDarkMode ? "text-white" : "text-foreground")}>{link.title}</span>
                       </div>
                       <span className="text-xl text-muted-foreground">→</span>
                     </button>
@@ -430,50 +515,63 @@ const BrandBioPage = () => {
             {/* Social Media Buttons */}
             {(brand.facebook_url || brand.instagram_url) && (
               <>
-                <div className="border-t border-border my-8" />
-                <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-center pb-2 border-b-2 inline-block w-full" style={{ color: brand.color, borderColor: brand.color }}>
-                  Connect With Us
-                </h2>
+                <div className={cn("border-t my-8", isDarkMode ? "border-gray-700" : "border-border")} />
+                {templateConfig.showCategories && (
+                  <h2 className="text-sm font-bold uppercase tracking-wider mb-4 text-center pb-2 border-b-2 inline-block w-full" style={{ color: brand.color, borderColor: brand.color }}>
+                    Connect With Us
+                  </h2>
+                )}
                 <div className="flex justify-center gap-4">
                   {brand.facebook_url && (
-            <a
-              href={brand.facebook_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
-            >
-              <Facebook className="w-6 h-6" style={{ color: brand.color }} />
-            </a>
+                    <a
+                      href={brand.facebook_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-md",
+                        isDarkMode ? "bg-gray-800" : "bg-white"
+                      )}
+                    >
+                      <Facebook className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
                   )}
                   {brand.instagram_url && (
-            <a
-              href={brand.instagram_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
-            >
-              <Instagram className="w-6 h-6" style={{ color: brand.color }} />
-            </a>
+                    <a
+                      href={brand.instagram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-md",
+                        isDarkMode ? "bg-gray-800" : "bg-white"
+                      )}
+                    >
+                      <Instagram className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
                   )}
                   {brand.facebook_url && (
-            <a
-              href={`https://m.me/${brand.facebook_url.split('/').pop()}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-14 h-14 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-md"
-            >
-              <MessageCircle className="w-6 h-6" style={{ color: brand.color }} />
-            </a>
+                    <a
+                      href={`https://m.me/${brand.facebook_url.split('/').pop()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        "w-14 h-14 rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-md",
+                        isDarkMode ? "bg-gray-800" : "bg-white"
+                      )}
+                    >
+                      <MessageCircle className="w-6 h-6" style={{ color: brand.color }} />
+                    </a>
                   )}
                 </div>
               </>
             )}
 
             {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-border">
-              {/* Gym Details Box */}
-              <div className="bg-muted/30 rounded-xl p-4 mb-4 text-center">
-                <p className="font-bold text-foreground mb-2">{brand.name}</p>
+            <div className={cn("mt-8 pt-6 border-t", isDarkMode ? "border-gray-700" : "border-border")}>
+              <div className={cn(
+                "rounded-xl p-4 mb-4 text-center",
+                isDarkMode ? "bg-gray-800" : "bg-muted/30"
+              )}>
+                <p className={cn("font-bold mb-2", isDarkMode ? "text-white" : "text-foreground")}>{brand.name}</p>
                 {brand.address && (
                   <p className="text-sm text-muted-foreground mb-1">
                     {brand.address}
@@ -488,7 +586,6 @@ const BrandBioPage = () => {
                 )}
               </div>
               
-              {/* Copyright */}
               <p className="text-xs text-center text-muted-foreground">
                 © {new Date().getFullYear()} {brand.name}
               </p>
