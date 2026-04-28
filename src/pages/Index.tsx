@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, Users, Link2, LogOut, MousePointerClick, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useBrands, useBrandTopSources } from "@/hooks/useBrands";
 import { usePinAuth } from "@/hooks/usePinAuth";
