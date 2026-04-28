@@ -1,48 +1,32 @@
 
+# Lock down the dashboard
 
-## Plan: Fix Navigation & Admin Experience
+Three changes, all behind the scenes. You won't notice anything different — but the dashboard will be properly secured.
 
-I'll implement a complete navigation overhaul:
+## What I'm doing
 
-### **Phase 1: Rename & Restructure Dashboard Navigation**
-1. **On Main Dashboard (`src/pages/Index.tsx`):**
-   - Rename "Settings" button to **"Admin Panel"** with a Shield icon
-   - Keep the same destination (`/biopage/admin/dashboard-settings`)
+**1. Make the admin flag actually work**
+Right now the code has an "is admin" checkbox on each PIN, but it's ignored. I'll make it real:
+- Only PINs marked as admin can reach the dashboard or any `/admin/*` page.
+- If you ever hand a gym their own PIN, they'll be bounced out — they won't see other gyms.
+- Today, only your "Jayme" PIN is admin, so nothing changes for you.
 
-2. **On Admin Panel (`src/pages/AdminDashboardSettings.tsx`):**
-   - Rename page title from "Dashboard Settings" to **"Admin Panel"**
-   - Rename subtitle to "Manage BioHub system settings and tools"
-   - **Add Video Upload** to the tools section (it's currently missing!)
-   - Separate into clear sections:
-     - **Tools** (Link Generator, PIN Management, Documentation, Video Upload)
-     - **Settings** (Hero Image, Clear Stats, Refresh Stats)
+**2. Brute-force lockout on the PIN screen**
+- After 5 wrong PIN attempts from the same browser, lock for 15 minutes.
+- Stops bots from guessing 4-digit PINs.
 
-### **Phase 2: Fix Back Button Inconsistency**
-3. **Standardize all admin pages:**
-   - Link Generator: Back → Admin Panel (keep as is)
-   - PIN Management: Back → Admin Panel (change from `/biopage`)
-   - Documentation: Back → Admin Panel
-   - Video Upload: Back → Admin Panel
-   - Edit Gym: Back → Dashboard (keep as is, but add breadcrumb)
-   - Analytics: Back → Dashboard (keep as is, but add breadcrumb)
+**3. Fix Houston's missing short_code**
+- Houston Gymnastics Academy has no short_code, so its campaign tracking links don't generate. I'll add one (`houstongym`) so it works like the other 9 gyms.
 
-### **Phase 3: Add Breadcrumb Navigation**
-4. **Create a reusable Breadcrumb component** that shows:
-   - `Dashboard > Admin Panel > Link Generator`
-   - `Dashboard > Edit: Capital Gymnastics`
-   - Makes it clear where you are at all times
+## What stays the same
+- Your login flow — same PIN, same screen.
+- The 🎁 secret access combo on gym pages.
+- Every gym page stays public at `/biopage/:handle`.
+- Drag-to-reorder, edit gym, analytics — all unchanged.
 
-### **Files to Modify:**
-- `src/pages/Index.tsx` - Rename Settings button
-- `src/pages/AdminDashboardSettings.tsx` - Rename page, add Video Upload link, reorganize
-- `src/pages/AdminPinManagement.tsx` - Fix back button destination
-- `src/pages/AdminVideoUpload.tsx` - Add back button
-- `src/pages/AdminLinkGenerator.tsx` - Already correct
-- Create `src/components/AdminBreadcrumb.tsx` - New reusable component
-
-### **Result:**
-- Clear "Admin Panel" access from dashboard
-- All admin tools accessible from one place
-- Consistent navigation across all pages
-- Users never get lost
-
+## Files touched (technical)
+- `src/components/ProtectedRoute.tsx` — enforce the admin flag
+- `src/hooks/usePinAuth.ts` — track failed attempts, enforce lockout
+- `src/pages/AuthPage.tsx` — show lockout countdown if triggered
+- New: `src/pages/NoAccess.tsx` — friendly "you don't have access" screen for non-admin PINs
+- DB: one update to set Houston's short_code
