@@ -14,6 +14,7 @@ import AdminDashboardSettings from "./pages/AdminDashboardSettings";
 import AdminPinManagement from "./pages/AdminPinManagement";
 import AdminDocumentation from "./pages/AdminDocumentation";
 import AuthPage from "./pages/AuthPage";
+import NoAccess from "./pages/NoAccess";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ShortLinkRedirect from "./pages/ShortLinkRedirect";
 
@@ -95,8 +96,9 @@ const App = () => (
             } 
           />
           
-          {/* Auth page */}
+          {/* Auth pages */}
           <Route path="/biopage/auth" element={<AuthPage />} />
+          <Route path="/biopage/no-access" element={<NoAccess />} />
           
           {/* Short link redirect */}
           <Route path="/go/:shortCode" element={<ShortLinkRedirect />} />

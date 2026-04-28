@@ -109,14 +109,21 @@ export default function AuthPage() {
                 required
                 minLength={4}
                 maxLength={6}
+                disabled={lockoutMs > 0}
                 className="h-14 text-center text-2xl tracking-widest font-mono"
                 autoComplete="off"
               />
+              {lockoutMs > 0 && (
+                <p className="text-sm text-destructive text-center">
+                  Locked. Try again in {Math.ceil(lockoutMs / 60000)} minute
+                  {Math.ceil(lockoutMs / 60000) > 1 ? 's' : ''}.
+                </p>
+              )}
             </div>
             <Button
               type="submit"
               className="w-full h-12 text-lg font-semibold"
-              disabled={isLoading || pin.length < 4}
+              disabled={isLoading || pin.length < 4 || lockoutMs > 0}
             >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
