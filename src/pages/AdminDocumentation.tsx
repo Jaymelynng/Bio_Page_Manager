@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Download, RefreshCw, Loader2, CheckCircle } from "lucide-react";
+import AdminBreadcrumb from "@/components/AdminBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -126,6 +127,13 @@ const AdminDocumentation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#d6c5bf] via-[#e6e6e6] to-[#c3a5a5] p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
+        <AdminBreadcrumb
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: "Admin Panel", to: "/biopage/admin/dashboard-settings" },
+            { label: "Documentation" },
+          ]}
+        />
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button

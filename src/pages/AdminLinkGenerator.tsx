@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Copy, Check, Plus, Trash2, Instagram, Facebook, Mail, MessageCircle, Globe } from "lucide-react";
+import AdminBreadcrumb from "@/components/AdminBreadcrumb";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useCampaigns, useCreateCampaign, useDeleteCampaign, generateShareableUrl } from "@/hooks/useCampaigns";
@@ -100,6 +101,14 @@ const AdminLinkGenerator = () => {
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto max-w-4xl">
+        <AdminBreadcrumb
+          className="mb-4"
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: "Admin Panel", to: "/biopage/admin/dashboard-settings" },
+            { label: "Link Generator" },
+          ]}
+        />
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

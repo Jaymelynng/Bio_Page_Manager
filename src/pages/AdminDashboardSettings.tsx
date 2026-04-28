@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Upload, Image, Loader2, RefreshCw, LinkIcon, Trash2, Key, FileText } from "lucide-react";
+import { ArrowLeft, Upload, Image, Loader2, RefreshCw, LinkIcon, Trash2, Key, FileText, Video } from "lucide-react";
+import AdminBreadcrumb from "@/components/AdminBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -187,27 +188,23 @@ const AdminDashboardSettings = () => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-[#737373]">Dashboard Settings</h1>
-            <p className="text-sm text-[#737373]/70">Customize your BioHub dashboard</p>
+            <h1 className="text-2xl font-bold text-[#737373]">Admin Panel</h1>
+            <p className="text-sm text-[#737373]/70">Manage BioHub system settings and tools</p>
           </div>
         </div>
+
+        <AdminBreadcrumb
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: "Admin Panel" },
+          ]}
+        />
 
         {/* Tools Section */}
         <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
           <h2 className="font-semibold text-[#737373] text-lg">Tools</h2>
-          
-          <div className="grid gap-3">
-            <Button
-              variant="outline"
-              onClick={handleRefreshStats}
-              disabled={isRefreshing}
-              className="w-full justify-start h-12"
-            >
-              <RefreshCw className={`h-4 w-4 mr-3 ${isRefreshing ? 'animate-spin' : ''}`} />
-              {isRefreshing ? 'Refreshing...' : 'Refresh Stats'}
-              <span className="ml-auto text-xs text-muted-foreground">Update dashboard data</span>
-            </Button>
 
+          <div className="grid gap-3">
             <Button
               variant="outline"
               onClick={() => navigate('/biopage/admin/link-generator')}
@@ -216,6 +213,16 @@ const AdminDashboardSettings = () => {
               <LinkIcon className="h-4 w-4 mr-3" />
               Link Generator
               <span className="ml-auto text-xs text-muted-foreground">Create UTM-tagged URLs</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => navigate('/biopage/admin/pin-management')}
+              className="w-full justify-start h-12"
+            >
+              <Key className="h-4 w-4 mr-3" />
+              PIN Management
+              <span className="ml-auto text-xs text-muted-foreground">View & reset user PINs</span>
             </Button>
 
             <Button
@@ -230,18 +237,36 @@ const AdminDashboardSettings = () => {
 
             <Button
               variant="outline"
-              onClick={() => navigate('/biopage/admin/pin-management')}
+              onClick={() => navigate('/biopage/admin/upload-videos')}
               className="w-full justify-start h-12"
             >
-              <Key className="h-4 w-4 mr-3" />
-              PIN Management
-              <span className="ml-auto text-xs text-muted-foreground">View & reset user PINs</span>
+              <Video className="h-4 w-4 mr-3" />
+              Video Upload
+              <span className="ml-auto text-xs text-muted-foreground">Upload gym hero videos</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Settings Section */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 space-y-4">
+          <h2 className="font-semibold text-[#737373] text-lg">Settings</h2>
+
+          <div className="grid gap-3">
+            <Button
+              variant="outline"
+              onClick={handleRefreshStats}
+              disabled={isRefreshing}
+              className="w-full justify-start h-12"
+            >
+              <RefreshCw className={`h-4 w-4 mr-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh Stats'}
+              <span className="ml-auto text-xs text-muted-foreground">Update dashboard data</span>
             </Button>
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start h-12 border-destructive/50 text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="h-4 w-4 mr-3" />
@@ -258,7 +283,7 @@ const AdminDashboardSettings = () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction 
+                  <AlertDialogAction
                     onClick={handleClearAllStats}
                     disabled={isClearing}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"

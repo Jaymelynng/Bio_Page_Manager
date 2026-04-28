@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, MousePointerClick, Link2, Calendar, Smartphone, Monitor, Target } from "lucide-react";
+import AdminBreadcrumb from "@/components/AdminBreadcrumb";
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
@@ -165,10 +166,10 @@ const AdminAnalytics = () => {
     >
       <div className="container mx-auto max-w-5xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="outline" 
-            size="sm" 
+        <div className="flex items-center gap-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => navigate('/biopage')}
             className="bg-background/80"
           >
@@ -182,6 +183,14 @@ const AdminAnalytics = () => {
             <p className="text-muted-foreground text-sm">Link clicks & engagement</p>
           </div>
         </div>
+        <AdminBreadcrumb
+          className="mb-6"
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: `${brand?.name || 'Gym'} Analytics` },
+          ]}
+        />
+
 
         {isLoading ? (
           <div className="grid gap-6">

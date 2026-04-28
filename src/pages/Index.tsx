@@ -2,7 +2,7 @@ import { BrandCard } from "@/components/BrandCard";
 import { StatsCard } from "@/components/StatsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Users, Link2, LogOut, MousePointerClick, Settings } from "lucide-react";
+import { BarChart3, Users, Link2, LogOut, MousePointerClick, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -63,8 +63,8 @@ const Index = () => {
           onClick={() => navigate('/biopage/admin/dashboard-settings')}
           className="bg-background/80 backdrop-blur-sm hover:bg-background"
         >
-          <Settings className="h-4 w-4 mr-2" />
-          Settings
+          <Shield className="h-4 w-4 mr-2" />
+          Admin Panel
         </Button>
         <Button 
           variant="outline" 

@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Save, Loader2, ExternalLink, Plus, Layout } from 'lucide-react';
+import AdminBreadcrumb from '@/components/AdminBreadcrumb';
 import { z } from 'zod';
 import TemplateSelector from '@/components/TemplateSelector';
 import DraggableLinks from '@/components/DraggableLinks';
@@ -330,7 +331,7 @@ export default function AdminEditGym() {
     <div className="min-h-screen bg-gradient-to-b from-[#d6c5bf] via-[#e6e6e6] to-[#c3a5a5] p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-4">
             <Button variant="outline" size="icon" onClick={() => navigate('/biopage')}>
               <ArrowLeft className="h-4 w-4" />
@@ -347,6 +348,14 @@ export default function AdminEditGym() {
             </Button>
           </Link>
         </div>
+        <AdminBreadcrumb
+          className="mb-6"
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: `Edit: ${brand.name}` },
+          ]}
+        />
+
 
         <Tabs defaultValue="details" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
