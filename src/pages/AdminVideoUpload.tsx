@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useBrands } from "@/hooks/useBrands";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, CheckCircle2, Loader2, ArrowLeft } from "lucide-react";
+import AdminBreadcrumb from "@/components/AdminBreadcrumb";
 
 export default function AdminVideoUpload() {
+  const navigate = useNavigate();
   const { data: brands, isLoading } = useBrands();
   const { toast } = useToast();
   const [uploadingIds, setUploadingIds] = useState<Set<string>>(new Set());
@@ -87,11 +90,28 @@ export default function AdminVideoUpload() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-foreground">Upload Gym Drone Videos</h1>
-          <p className="text-muted-foreground">
-            Upload hero videos for each gym location. Videos will appear on their bio pages.
-          </p>
+        <AdminBreadcrumb
+          items={[
+            { label: "Dashboard", to: "/biopage" },
+            { label: "Admin Panel", to: "/biopage/admin/dashboard-settings" },
+            { label: "Video Upload" },
+          ]}
+        />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/biopage/admin/dashboard-settings')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <div className="text-center space-y-2 flex-1">
+            <h1 className="text-4xl font-bold text-foreground">Upload Gym Drone Videos</h1>
+            <p className="text-muted-foreground">
+              Upload hero videos for each gym location. Videos will appear on their bio pages.
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-4">
