@@ -12,7 +12,8 @@ import biohubHero from '@/assets/biohub-hero.png';
 export default function AuthPage() {
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { verifyPin, isAuthenticated, loading } = usePinAuth();
+  const [lockoutMs, setLockoutMs] = useState(0);
+  const { verifyPin, isAuthenticated, loading, getLockoutRemaining } = usePinAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,13 +24,21 @@ export default function AuthPage() {
     }
   }, [isAuthenticated, loading, navigate]);
 
+  // Check existing lockout on mount + tick countdown
+  useEffect(() => {
+    const tick = () => setLockoutMs(getLockoutRemaining());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [getLockoutRemaining]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { success, error } = await verifyPin(pin);
-      
+      const { success, error, lockoutMs: newLockout } = await verifyPin(pin);
+
       if (success) {
         toast({
           title: 'Welcome!',
@@ -37,6 +46,8 @@ export default function AuthPage() {
         });
         navigate('/biopage');
       } else {
+        if (newLockout) setLockoutMs(newLockout);
+        setPin('');
         toast({
           title: 'Invalid PIN',
           description: error || 'Please check your PIN and try again.',
@@ -98,14 +109,21 @@ export default function AuthPage() {
                 required
                 minLength={4}
                 maxLength={6}
+                disabled={lockoutMs > 0}
                 className="h-14 text-center text-2xl tracking-widest font-mono"
                 autoComplete="off"
               />
+              {lockoutMs > 0 && (
+                <p className="text-sm text-destructive text-center">
+                  Locked. Try again in {Math.ceil(lockoutMs / 60000)} minute
+                  {Math.ceil(lockoutMs / 60000) > 1 ? 's' : ''}.
+                </p>
+              )}
             </div>
             <Button
               type="submit"
               className="w-full h-12 text-lg font-semibold"
-              disabled={isLoading || pin.length < 4}
+              disabled={isLoading || pin.length < 4 || lockoutMs > 0}
             >
               {isLoading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />

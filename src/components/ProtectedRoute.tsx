@@ -4,11 +4,11 @@ import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireAdmin?: boolean; // Kept for compatibility, but not enforced yet
+  requireAdmin?: boolean;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, loading } = usePinAuth();
+export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+  const { isAuthenticated, isAdmin, loading } = usePinAuth();
 
   if (loading) {
     return (
@@ -20,6 +20,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to="/biopage/auth" replace />;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/biopage/no-access" replace />;
   }
 
   return <>{children}</>;
