@@ -21,6 +21,23 @@ const Index = () => {
   const navigate = useNavigate();
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null);
 
+  // Real month-over-month click change
+  const { data: clickTrend } = useQuery({
+    queryKey: ["click-trend"],
+    queryFn: async () => {
+      const now = new Date();
+      const startThisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+
+      const [{ count: thisMonth }, { count: lastMonth }] = await Promise.all([
+        supabase.from("link_analytics").select("*", { count: "exact", head: true }).gte("clicked_at", startThisMonth),
+        supabase.from("link_analytics").select("*", { count: "exact", head: true }).gte("clicked_at", startLastMonth).lt("clicked_at", startThisMonth),
+      ]);
+      return { thisMonth: thisMonth || 0, lastMonth: lastMonth || 0 };
+    },
+    staleTime: 60 * 1000,
+  });
+
   useEffect(() => {
     const fetchHeroImage = async () => {
       const { data } = await supabase
