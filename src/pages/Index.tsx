@@ -114,37 +114,52 @@ const Index = () => {
             <Skeleton className="h-36 rounded-2xl" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatsCard
-              title="Total Clicks"
-              value={totalClicks.toLocaleString()}
-              change="+12.3% from last month"
-              icon={MousePointerClick}
-              trend="up"
-            />
-            <StatsCard
-              title="Clicks/Link"
-              value={clicksPerLink}
-              change="Average engagement"
-              icon={BarChart3}
-              trend="up"
-            />
-            <StatsCard
-              title="Active Gyms"
-              value={activeBrands.toString()}
-              change="All pages live"
-              icon={Users}
-              trend="up"
-            />
-            <StatsCard
-              title="Total Links"
-              value={totalLinks.toString()}
-              change="Across all gyms"
-              icon={Link2}
-              trend="up"
-            />
-          </div>
-        )}
+          (() => {
+            const thisMonth = clickTrend?.thisMonth ?? 0;
+            const lastMonth = clickTrend?.lastMonth ?? 0;
+            let changeText = "No prior data";
+            let trend: "up" | "down" = "up";
+            if (lastMonth > 0) {
+              const pct = ((thisMonth - lastMonth) / lastMonth) * 100;
+              trend = pct >= 0 ? "up" : "down";
+              changeText = `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}% from last month`;
+            } else if (thisMonth > 0) {
+              changeText = `${thisMonth} clicks this month`;
+            }
+            const topBrand = brands?.slice().sort((a: any, b: any) => (getStats(b).total_clicks || 0) - (getStats(a).total_clicks || 0))[0];
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatsCard
+                  title="Total Clicks"
+                  value={totalClicks.toLocaleString()}
+                  change={changeText}
+                  icon={MousePointerClick}
+                  trend={trend}
+                />
+                <StatsCard
+                  title="Clicks/Link"
+                  value={clicksPerLink}
+                  change={totalLinks > 0 ? `Across ${totalLinks} links` : "No links yet"}
+                  icon={BarChart3}
+                  trend="up"
+                />
+                <StatsCard
+                  title="Active Gyms"
+                  value={activeBrands.toString()}
+                  change={topBrand ? `Top: ${topBrand.name}` : "No gyms yet"}
+                  icon={Users}
+                  trend="up"
+                />
+                <StatsCard
+                  title="Total Links"
+                  value={totalLinks.toString()}
+                  change={activeBrands > 0 ? `${(totalLinks / activeBrands).toFixed(1)} avg per gym` : "No gyms yet"}
+                  icon={Link2}
+                  trend="up"
+                />
+              </div>
+            );
+          })()
       </div>
 
       {/* Brands Grid */}
