@@ -292,7 +292,7 @@ const AdminPinManagement = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/biopage')}
+              onClick={() => navigate('/biopage/admin/dashboard-settings')}
               className="bg-white/80 hover:bg-white shadow-md"
             >
               <ArrowLeft className="h-5 w-5" />
